@@ -7,27 +7,77 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F109F1C518D8EDC800201A84 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F109F1C418D8EDC800201A84 /* main.cpp */; };
-		F109F1C718D8EDC800201A84 /* cs488_proj.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F109F1C618D8EDC800201A84 /* cs488_proj.1 */; };
+		F111DFE918D8F071001D69D2 /* a4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCB18D8F071001D69D2 /* a4.cpp */; };
+		F111DFEA18D8F071001D69D2 /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCD18D8F071001D69D2 /* algebra.cpp */; };
+		F111DFEB18D8F071001D69D2 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCF18D8F071001D69D2 /* image.cpp */; };
+		F111DFEC18D8F071001D69D2 /* light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFD218D8F071001D69D2 /* light.cpp */; };
+		F111DFED18D8F071001D69D2 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFD518D8F071001D69D2 /* main.cpp */; };
+		F111DFEF18D8F071001D69D2 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFD718D8F071001D69D2 /* material.cpp */; };
+		F111DFF118D8F071001D69D2 /* polyroots.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFDC18D8F071001D69D2 /* polyroots.cpp */; };
+		F111DFF218D8F071001D69D2 /* primitive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFDE18D8F071001D69D2 /* primitive.cpp */; };
+		F111DFF318D8F071001D69D2 /* renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFE018D8F071001D69D2 /* renderer.cpp */; };
+		F111DFF418D8F071001D69D2 /* scene_lua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFE318D8F071001D69D2 /* scene_lua.cpp */; };
+		F111DFF518D8F071001D69D2 /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFE518D8F071001D69D2 /* scene.cpp */; };
+		F111DFF618D8F071001D69D2 /* transform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFE718D8F071001D69D2 /* transform.cpp */; };
+		F111DFF918D8F107001D69D2 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F111DFF718D8F107001D69D2 /* liblua.a */; };
+		F111DFFA18D8F107001D69D2 /* libpng12.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F111DFF818D8F107001D69D2 /* libpng12.a */; };
+		F111DFFC18D8F401001D69D2 /* sample.lua in CopyFiles */ = {isa = PBXBuildFile; fileRef = F111DFE218D8F071001D69D2 /* sample.lua */; };
+		F172F6F518DB815600280883 /* shape2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F172F6F318DB815600280883 /* shape2d.cpp */; };
+		F18D1BE118DF6E6E007ED6FD /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F18D1BDF18DF6E6E007ED6FD /* camera.cpp */; };
+		F1F6D19718D8FEA4006878AE /* photon_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1F6D19518D8FEA4006878AE /* photon_map.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		F109F1BF18D8EDC800201A84 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
-				F109F1C718D8EDC800201A84 /* cs488_proj.1 in CopyFiles */,
+				F111DFFC18D8F401001D69D2 /* sample.lua in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F109F1C118D8EDC800201A84 /* cs488-proj */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cs488-proj"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F109F1C418D8EDC800201A84 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		F109F1C618D8EDC800201A84 /* cs488_proj.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = cs488_proj.1; sourceTree = "<group>"; };
+		F111DFCB18D8F071001D69D2 /* a4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = a4.cpp; sourceTree = "<group>"; };
+		F111DFCC18D8F071001D69D2 /* a4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = a4.hpp; sourceTree = "<group>"; };
+		F111DFCD18D8F071001D69D2 /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algebra.cpp; sourceTree = "<group>"; };
+		F111DFCE18D8F071001D69D2 /* algebra.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = algebra.hpp; sourceTree = "<group>"; };
+		F111DFCF18D8F071001D69D2 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
+		F111DFD018D8F071001D69D2 /* image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = image.hpp; sourceTree = "<group>"; };
+		F111DFD218D8F071001D69D2 /* light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = light.cpp; sourceTree = "<group>"; };
+		F111DFD318D8F071001D69D2 /* light.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = light.hpp; sourceTree = "<group>"; };
+		F111DFD418D8F071001D69D2 /* lua488.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = lua488.hpp; sourceTree = "<group>"; };
+		F111DFD518D8F071001D69D2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		F111DFD718D8F071001D69D2 /* material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = material.cpp; sourceTree = "<group>"; };
+		F111DFD818D8F071001D69D2 /* material.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = material.hpp; sourceTree = "<group>"; };
+		F111DFD918D8F071001D69D2 /* mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mesh.hpp; sourceTree = "<group>"; };
+		F111DFDC18D8F071001D69D2 /* polyroots.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = polyroots.cpp; sourceTree = "<group>"; };
+		F111DFDD18D8F071001D69D2 /* polyroots.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = polyroots.hpp; sourceTree = "<group>"; };
+		F111DFDE18D8F071001D69D2 /* primitive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive.cpp; sourceTree = "<group>"; };
+		F111DFDF18D8F071001D69D2 /* primitive.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive.hpp; sourceTree = "<group>"; };
+		F111DFE018D8F071001D69D2 /* renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = renderer.cpp; sourceTree = "<group>"; };
+		F111DFE118D8F071001D69D2 /* renderer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = renderer.hpp; sourceTree = "<group>"; };
+		F111DFE218D8F071001D69D2 /* sample.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sample.lua; sourceTree = "<group>"; };
+		F111DFE318D8F071001D69D2 /* scene_lua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scene_lua.cpp; sourceTree = "<group>"; };
+		F111DFE418D8F071001D69D2 /* scene_lua.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = scene_lua.hpp; sourceTree = "<group>"; };
+		F111DFE518D8F071001D69D2 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scene.cpp; sourceTree = "<group>"; };
+		F111DFE618D8F071001D69D2 /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = scene.hpp; sourceTree = "<group>"; };
+		F111DFE718D8F071001D69D2 /* transform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transform.cpp; sourceTree = "<group>"; };
+		F111DFE818D8F071001D69D2 /* transform.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = transform.hpp; sourceTree = "<group>"; };
+		F111DFF718D8F107001D69D2 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../../../../usr/local/lib/liblua.a; sourceTree = "<group>"; };
+		F111DFF818D8F107001D69D2 /* libpng12.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng12.a; path = ../../../../../usr/local/lib/libpng12.a; sourceTree = "<group>"; };
+		F1484D0D18E0C88500ECDB7B /* intersection_point.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intersection_point.hpp; sourceTree = "<group>"; };
+		F172F6F318DB815600280883 /* shape2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shape2d.cpp; sourceTree = "<group>"; };
+		F172F6F418DB815600280883 /* shape2d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = shape2d.hpp; sourceTree = "<group>"; };
+		F18D1BDF18DF6E6E007ED6FD /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
+		F18D1BE018DF6E6E007ED6FD /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = camera.hpp; sourceTree = "<group>"; };
+		F1C30C9E18D916280033D4B2 /* scene.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = scene.lua; path = "../../../../Library/Developer/Xcode/DerivedData/cs488-proj-dzmlmavzolkufifyciayonasmrid/Build/Products/Debug/scene.lua"; sourceTree = "<group>"; };
+		F1F6D19518D8FEA4006878AE /* photon_map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = photon_map.cpp; sourceTree = "<group>"; };
+		F1F6D19618D8FEA4006878AE /* photon_map.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = photon_map.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +85,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F111DFF918D8F107001D69D2 /* liblua.a in Frameworks */,
+				F111DFFA18D8F107001D69D2 /* libpng12.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +96,8 @@
 		F109F1B818D8EDC800201A84 = {
 			isa = PBXGroup;
 			children = (
+				F111DFF718D8F107001D69D2 /* liblua.a */,
+				F111DFF818D8F107001D69D2 /* libpng12.a */,
 				F109F1C318D8EDC800201A84 /* cs488-proj */,
 				F109F1C218D8EDC800201A84 /* Products */,
 			);
@@ -60,8 +114,40 @@
 		F109F1C318D8EDC800201A84 /* cs488-proj */ = {
 			isa = PBXGroup;
 			children = (
-				F109F1C418D8EDC800201A84 /* main.cpp */,
-				F109F1C618D8EDC800201A84 /* cs488_proj.1 */,
+				F1C30C9E18D916280033D4B2 /* scene.lua */,
+				F111DFCB18D8F071001D69D2 /* a4.cpp */,
+				F111DFCC18D8F071001D69D2 /* a4.hpp */,
+				F111DFCD18D8F071001D69D2 /* algebra.cpp */,
+				F111DFCE18D8F071001D69D2 /* algebra.hpp */,
+				F111DFCF18D8F071001D69D2 /* image.cpp */,
+				F111DFD018D8F071001D69D2 /* image.hpp */,
+				F1484D0D18E0C88500ECDB7B /* intersection_point.hpp */,
+				F111DFD218D8F071001D69D2 /* light.cpp */,
+				F111DFD318D8F071001D69D2 /* light.hpp */,
+				F111DFD418D8F071001D69D2 /* lua488.hpp */,
+				F111DFD518D8F071001D69D2 /* main.cpp */,
+				F111DFD718D8F071001D69D2 /* material.cpp */,
+				F111DFD818D8F071001D69D2 /* material.hpp */,
+				F111DFD918D8F071001D69D2 /* mesh.hpp */,
+				F172F6F318DB815600280883 /* shape2d.cpp */,
+				F172F6F418DB815600280883 /* shape2d.hpp */,
+				F111DFDC18D8F071001D69D2 /* polyroots.cpp */,
+				F111DFDD18D8F071001D69D2 /* polyroots.hpp */,
+				F111DFDE18D8F071001D69D2 /* primitive.cpp */,
+				F111DFDF18D8F071001D69D2 /* primitive.hpp */,
+				F18D1BDF18DF6E6E007ED6FD /* camera.cpp */,
+				F18D1BE018DF6E6E007ED6FD /* camera.hpp */,
+				F111DFE018D8F071001D69D2 /* renderer.cpp */,
+				F111DFE118D8F071001D69D2 /* renderer.hpp */,
+				F111DFE218D8F071001D69D2 /* sample.lua */,
+				F111DFE318D8F071001D69D2 /* scene_lua.cpp */,
+				F111DFE418D8F071001D69D2 /* scene_lua.hpp */,
+				F111DFE518D8F071001D69D2 /* scene.cpp */,
+				F111DFE618D8F071001D69D2 /* scene.hpp */,
+				F111DFE718D8F071001D69D2 /* transform.cpp */,
+				F111DFE818D8F071001D69D2 /* transform.hpp */,
+				F1F6D19518D8FEA4006878AE /* photon_map.cpp */,
+				F1F6D19618D8FEA4006878AE /* photon_map.hpp */,
 			);
 			path = "cs488-proj";
 			sourceTree = "<group>";
@@ -117,7 +203,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F109F1C518D8EDC800201A84 /* main.cpp in Sources */,
+				F111DFF418D8F071001D69D2 /* scene_lua.cpp in Sources */,
+				F111DFEA18D8F071001D69D2 /* algebra.cpp in Sources */,
+				F1F6D19718D8FEA4006878AE /* photon_map.cpp in Sources */,
+				F172F6F518DB815600280883 /* shape2d.cpp in Sources */,
+				F18D1BE118DF6E6E007ED6FD /* camera.cpp in Sources */,
+				F111DFF118D8F071001D69D2 /* polyroots.cpp in Sources */,
+				F111DFF318D8F071001D69D2 /* renderer.cpp in Sources */,
+				F111DFEF18D8F071001D69D2 /* material.cpp in Sources */,
+				F111DFE918D8F071001D69D2 /* a4.cpp in Sources */,
+				F111DFF518D8F071001D69D2 /* scene.cpp in Sources */,
+				F111DFF618D8F071001D69D2 /* transform.cpp in Sources */,
+				F111DFF218D8F071001D69D2 /* primitive.cpp in Sources */,
+				F111DFEC18D8F071001D69D2 /* light.cpp in Sources */,
+				F111DFED18D8F071001D69D2 /* main.cpp in Sources */,
+				F111DFEB18D8F071001D69D2 /* image.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +297,12 @@
 		F109F1CB18D8EDC800201A84 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -204,6 +310,12 @@
 		F109F1CC18D8EDC800201A84 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -227,6 +339,7 @@
 				F109F1CC18D8EDC800201A84 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

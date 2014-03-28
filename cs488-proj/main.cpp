@@ -1,18 +1,16 @@
-//
-//  main.cpp
-//  cs488-proj
-//
-//  Created by Frank Li on 2014-03-18.
-//  Copyright (c) 2014 Xuefei Li. All rights reserved.
-//
-
 #include <iostream>
+#include "scene_lua.hpp"
 
-int main(int argc, const char * argv[])
+int main(int argc, char** argv)
 {
+  std::string filename = "scene.lua";
+  if (argc >= 2) {
+    filename = argv[1];
+  }
 
-    // insert code here...
-    std::cout << "Hello, World!\n";
-    return 0;
+  if (!run_lua(filename)) {
+    std::cerr << "Could not open " << filename << std::endl;
+    return 1;
+  }
 }
 
