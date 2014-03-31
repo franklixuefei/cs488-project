@@ -35,7 +35,7 @@ bool SceneNode::intersect(
     }
     if (intersect(eye, ray, ip, refl_id)) {
         
-        c = ip.m_owner->getColourForPoint(eye, ip, lights, ambient, refl_id);
+        c = ip.m_owner->getColourForPoint(eye, ip, lights, ambient, refl_id, (int)s_renderer->getNumPhotonRecursion());
         return true;
     }
     return false;

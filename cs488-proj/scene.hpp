@@ -116,7 +116,7 @@ public:
                              const std::list<Light*>& lights,
                              const Colour &ambient,
                              double refl_id,
-                             int recursive_depth = REFLECTION_RECURSIVE_DEPTH);
+                             int recursive_depth);
     
 protected:
     PhongMaterial* m_material;

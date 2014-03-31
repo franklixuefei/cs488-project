@@ -313,6 +313,11 @@ const string & Renderer::getRenderMode() const
     return m_render_mode;
 }
 
+size_t Renderer::getNumPhotonRecursion() const
+{
+    return m_photon_recursion;
+}
+
 void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double refl_id, size_t recur_depth)
 {
     if (recur_depth > m_photon_recursion) {

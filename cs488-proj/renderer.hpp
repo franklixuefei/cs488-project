@@ -41,6 +41,7 @@ public:
     double getPhotonSearchRadius() const;
     size_t getNumSearchPhotons() const;
     const string &getRenderMode() const;
+    size_t getNumPhotonRecursion() const;
 protected:
 	Colour background(int x, int y);
     void trace_photons(Point3D orig, Vector3D dir, Colour power, double refl_id, size_t recur_depth);
