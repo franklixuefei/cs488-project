@@ -16,6 +16,9 @@
 
 double Vector3D::normalize()
 {
+    if (isZero(this->length2() - 1.0, SMALL_EPSILON)) {
+        return 1.0;
+    }
   double denom = 1.0;
   double x = (v_[0] > 0.0) ? v_[0] : -v_[0];
   double y = (v_[1] > 0.0) ? v_[1] : -v_[1];

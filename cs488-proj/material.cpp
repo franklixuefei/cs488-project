@@ -2,9 +2,16 @@
 #include "primitive.hpp"
 #include "formulas.hpp"
 #include <cassert>
-PhongMaterial::PhongMaterial(const Colour& ks, const Colour &kt, double shininess, double refractive_index)
-: m_ks(ks), m_kt(kt), m_shininess(shininess), m_refractive_index(refractive_index)
+PhongMaterial::PhongMaterial(const Colour& ks, const Colour &kt, double shininess, double refractive_index, const string &bump_name)
+: m_ks(ks), m_kt(kt), m_shininess(shininess), m_refractive_index(refractive_index), m_bump_map(NULL)
 {
+    if (bump_name != "" ){
+        m_bump_map = new Image();
+        if (!m_bump_map->loadPng(bump_name)) {
+            cerr << "bump map " << bump_name << " not found." << endl;
+            exit(1);
+        }
+    }
 }
 
 PhongMaterial::~PhongMaterial()
@@ -31,6 +38,7 @@ Colour PhongMaterial::getColour(
                                 const std::list<Light*>& lights,
                                 const Colour& ambient,
                                 const IntersectionPoint &ip,
+                                const Vector3D &normal,
                                 Primitive *primitive) const
 {
     
@@ -46,9 +54,9 @@ Colour PhongMaterial::getColour(
         
         double dist = light_dir.length();
         light_dir.normalize();
-        Vector3D r = Formulas::perfectReflection(ip.m_normal, -1.0 * light_dir);
-        Colour contribution = (kd + m_ks * ( pow(r.dot(view), m_shininess) / ip.m_normal.dot(light_dir) )) *
-        (*it)->getColour() * light_dir.dot(ip.m_normal) *
+        Vector3D r = Formulas::perfectReflection(normal, -1.0 * light_dir);
+        Colour contribution = (kd + m_ks * ( pow(r.dot(view), m_shininess) / normal.dot(light_dir) )) *
+        (*it)->getColour() * light_dir.dot(normal) *
         (1 / ((*it)->getAttenuation()[0] + (*it)->getAttenuation()[1] * dist +
               (*it)->getAttenuation()[2] * dist * dist));
         if (contribution.R() >= 0 && contribution.G() >= 0 && contribution.B() >= 0) {
@@ -66,11 +74,54 @@ double PhongMaterial::getRefractiveIndex() const
 
 
 
-BasicPhongMaterial::BasicPhongMaterial(const Colour &kd, const Colour &ks, const Colour &kt, double shininess, double refractive_index) :
-PhongMaterial(ks, kt, shininess, refractive_index),
+bool PhongMaterial::getMapCoords(Primitive *primitive, const Point3D &p, Point2D& mapCoords, Image *map) const
+{
+    Point2D uvCoords = primitive->get2DTextureMapCoordinates(p);
+    int texture_width = map->width();
+    int texture_height = map->height();
+    mapCoords = Point2D(
+                        uvCoords[0] * (double)((double)texture_width - 1.0),
+                        uvCoords[1] * (double)((double)texture_height - 1.0)
+                        );
+    if (mapCoords[0] < -EPSILON || mapCoords[0] > (double)texture_width + EPSILON ||
+        mapCoords[1] < -EPSILON || mapCoords[1] > (double)texture_height + EPSILON) {
+        return false;
+    }
+    return true;
+    
+}
+
+Vector3D PhongMaterial::getNormal(const Vector3D &normal, Primitive *primitive, const Point3D &p) const
+{
+    Vector3D n = normal;
+    
+    if (m_bump_map) {
+        Point2D mapCoords(-1,-1);
+        if (!getMapCoords(primitive, p, mapCoords, m_bump_map)) {
+            cerr << "bump map coords out of bound"  << endl;
+            return n;
+        }
+
+        int x = mapCoords[0];
+        int y = mapCoords[1];
+        
+        n[0] += 2.0 * (*m_bump_map)(x, y, 0) - 1.0;
+        n[1] += 2.0 * (*m_bump_map)(x, y, 1) - 1.0;
+        n[2] += 2.0 * (*m_bump_map)(x, y, 2) - 1.0;
+        
+        if (!isZero(n.length2() - 1.0, SMALL_EPSILON)) {
+            n.normalize();
+        }
+    }
+    
+    return n;
+}
+
+
+BasicPhongMaterial::BasicPhongMaterial(const Colour &kd, const Colour &ks, const Colour &kt, double shininess, double refractive_index, const string& bump_name) :
+PhongMaterial(ks, kt, shininess, refractive_index, bump_name),
 m_kd(kd)
 {
-    
 }
 
 BasicPhongMaterial::~BasicPhongMaterial()
@@ -83,9 +134,8 @@ Colour BasicPhongMaterial::getDiffuse(Primitive *primitive, const Point3D &p) co
     return m_kd;
 }
 
-
-ImageTextureMaterial::ImageTextureMaterial(const string &filename, const Colour &ks, const Colour &kt, double shininess, double refractive_index) :
-PhongMaterial(ks, kt, shininess, refractive_index),
+ImageTextureMaterial::ImageTextureMaterial(const string &filename, const Colour &ks, const Colour &kt, double shininess, double refractive_index, const string& bump_name) :
+PhongMaterial(ks, kt, shininess, refractive_index, bump_name),
 m_texture_map(new Image())
 {
     if (!m_texture_map->loadPng(filename)) {
@@ -102,7 +152,7 @@ ImageTextureMaterial::~ImageTextureMaterial()
 Colour ImageTextureMaterial::getDiffuse(Primitive *primitive, const Point3D &p) const
 {
     Point2D mapCoords(-1,-1);
-    if (!getMapCoords(primitive, p, mapCoords)) {
+    if (!getMapCoords(primitive, p, mapCoords, m_texture_map)) {
         cerr << "texture map coords out of bound"  << endl;
         return Colour(1,0,0);
     }
@@ -150,22 +200,6 @@ Colour ImageTextureMaterial::getDiffuse(Primitive *primitive, const Point3D &p) 
     return ret;
 }
 
-bool ImageTextureMaterial::getMapCoords(Primitive *primitive, const Point3D &p, Point2D& mapCoords) const
-{
-    Point2D uvCoords = primitive->get2DTextureMapCoordinates(p);
-    int texture_width = m_texture_map->width();
-    int texture_height = m_texture_map->height();
-    mapCoords = Point2D(
-                        uvCoords[0] * (double)((double)texture_width - 1.0),
-                        uvCoords[1] * (double)((double)texture_height - 1.0)
-                        );
-    if (mapCoords[0] < -EPSILON || mapCoords[0] > (double)texture_width + EPSILON ||
-        mapCoords[1] < -EPSILON || mapCoords[1] > (double)texture_height + EPSILON) {
-        return false;
-    }
-    return true;
-    
-}
 
 
 

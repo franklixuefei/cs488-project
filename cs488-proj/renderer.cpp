@@ -106,13 +106,13 @@ void Renderer::build_photon_map()
 #warning TODO: more light types here...
             do {
                 x = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
-                y = -(1.0 * rand() / RAND_MAX);
+                y = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
                 z = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
             } while (x*x + y*y + z*z > 1.0 || y == 0);
             ray_dir = Vector3D(x, y, z);
             ray_dir.normalize();
             Colour power = light->getPower() * light->getColour();
-            m_photon_map->store(power.getRaw(), orig.getRaw(), (-1.0 * ray_dir).getRaw());
+//            m_photon_map->store((light->getBias() * power).getRaw(), orig.getRaw(), (-1.0 * ray_dir).getRaw());
             trace_photons(orig, ray_dir, power, 1.0, 0);
         }
         m_photon_map->scale_photon_power(1.0 / (double)light->getNumPhotons());
@@ -337,6 +337,7 @@ void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double re
     srefl_dir.normalize();
     Colour kd = ip.m_owner->get_material()->getDiffuse(ip.m_owner->get_primitive(), ip.m_orig_point);
     Colour kt = ip.m_owner->get_material()->getTransmittedColour();
+    Colour ks = ip.m_owner->get_material()->getSpecular();
     if (hitMatReflID != DBL_MAX) { // translucent object
 #warning ray is hitting out of the object (to the air), assuming no two intact objects.
         Vector3D t_dir;
@@ -378,8 +379,6 @@ void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double re
             }
         }
     } else { // non-translucent, specular or diffuse depending on kd_avg
-//        trace_photons(ip.m_point, refl_dir, reflP * power, refl_id, recur_depth + 1);
-        
         double kd_avg = (kd.R() + kd.G() + kd.B()) / 3.0;
         double refl_rand = 1.0 * rand() / RAND_MAX;
         if (refl_rand < kd_avg) { // diffuse reflection
@@ -390,7 +389,11 @@ void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double re
             // power of each photon remains unchanged, but the amount of photons decreases each time.
             trace_photons(ip.m_point, drefl_dir, power, refl_id, recur_depth+1);
         } else { // specular reflection
-            trace_photons(ip.m_point, srefl_dir, power, refl_id, recur_depth+1);
+            double ks_avg = (ks.R() + ks.G() + ks.B()) / 3.0;
+            double rand2 = 0.7 * rand() / RAND_MAX;
+            if (rand2 <= ks_avg) {
+                trace_photons(ip.m_point, srefl_dir, power, refl_id, recur_depth+1);
+            }
         }
     }
     

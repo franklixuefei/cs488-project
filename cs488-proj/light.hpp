@@ -13,7 +13,8 @@ public:
           const Point3D &position,
           const Vector3D &attenuation,
           size_t num_photons,
-          double photon_power);
+          double photon_power,
+          double power_bias);
     virtual ~Light()=0;
     Colour getColour() const;
     void setColour(const Colour &colour);
@@ -23,7 +24,7 @@ public:
     void setAttenuation(const Vector3D &attenuation);
     size_t getNumPhotons() const;
     double getPower() const;
-    
+    double getBias() const;
     friend std::ostream& operator<<(std::ostream& out, const Light& l);
     
 protected:
@@ -31,6 +32,7 @@ protected:
     Point3D m_position;
     size_t m_num_photons;
     double m_photon_power;
+    double m_power_bias;
     double m_falloff[3];
 };
 
@@ -42,7 +44,8 @@ public:
                const Point3D &position,
                const Vector3D &attenuation,
                size_t num_photons,
-               double photon_power);
+               double photon_power,
+               double power_bias);
     virtual ~PointLight();
     
 };
@@ -56,6 +59,7 @@ public:
                 const Vector3D &attenuation,
                 size_t num_photons,
                 double photon_power,
+                double power_bias,
                 double size);
     virtual ~SquareLight();
     double getSize() const;

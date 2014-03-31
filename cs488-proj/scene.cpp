@@ -137,37 +137,20 @@ Colour GeometryNode::getColourForPoint(
     
     Vector3D view_dir = ip.m_point - eye; // pointing to incident point
     view_dir.normalize();
-#warning hard-coded reflectance.
+    
+    Vector3D normal = ip.m_owner->get_material()->getNormal(ip.m_normal, ip.m_owner->get_primitive(), ip.m_orig_point);
+    
     double reflectance = 1.0;
     if (ip.m_owner->get_material()->getRefractiveIndex() != DBL_MAX) {
-        Colour crefr = refractionContribution(view_dir, ip.m_orig_normal, ip.m_point, lights, ambient, refl_id, reflectance, recursive_depth);
+        Colour crefr = refractionContribution(view_dir, normal, ip.m_point, lights, ambient, refl_id, reflectance, recursive_depth);
         c = c + (1.0 - reflectance) * crefr;
     }
-    c = c + ip.m_owner->get_material()->getSpecular() * reflectance * reflectionContribution(view_dir, ip.m_orig_normal, ip.m_point, lights, ambient, refl_id, recursive_depth);
+    c = c + ip.m_owner->get_material()->getSpecular() * reflectance * reflectionContribution(view_dir, normal, ip.m_point, lights, ambient, refl_id, recursive_depth);
     
-    c = c + lightsContribution(ip, lights, ambient, view_dir);
+    c = c + lightsContribution(ip, normal, lights, ambient, view_dir);
     return c;
 }
 
-/*
- 
- 
- 
- Vec x=r.o+r.d*t, n=(x-obj.p).norm(), nl=n.dot(r.d)<0?n:n*-1, f=obj.c;
- double p = f.x>f.y && f.x>f.z ? f.x : f.y>f.z ? f.y : f.z; // max refl
- 
- Ray reflRay(x, r.d-n*2*n.dot(r.d));     // Ideal dielectric REFRACTION
- bool into = n.dot(nl)>0;                // Ray from outside going in?
- double nc=1, nt=1.5, nnt=into?nc/nt:nt/nc, ddn=r.d.dot(nl), cos2t;
- if ((cos2t=1-nnt*nnt*(1-ddn*ddn))<0)    // Total internal reflection
- return obj.e + f.mult(radiance(reflRay,depth,Xi));
- Vec tdir = (r.d*nnt - n*((into?1:-1)*(ddn*nnt+sqrt(cos2t)))).norm();
- double a=nt-nc, b=nt+nc, R0=a*a/(b*b), c = 1-(into?-ddn:tdir.dot(n));
- double Re=R0+(1-R0)*c*c*c*c*c,Tr=1-Re,P=.25+.5*Re,RP=Re/P,TP=Tr/(1-P);
- return obj.e + f.mult(depth>2 ? (erand48(Xi)<P ?   // Russian roulette
- radiance(reflRay,depth,Xi)*RP:radiance(Ray(x,tdir),depth,Xi)*TP) :
- radiance(reflRay,depth,Xi)*Re+radiance(Ray(x,tdir),depth,Xi)*Tr);
- */
 
 Colour GeometryNode::refractionContribution(
                                             const Vector3D& view_dir,
@@ -239,6 +222,7 @@ Colour GeometryNode::reflectionContribution(const Vector3D& view_dir, // incomin
 
 Colour GeometryNode::lightsContribution(
                                         const IntersectionPoint& ip,
+                                        const Vector3D &normal,
                                         const std::list<Light*>& lights,
                                         const Colour &ambient,
                                         const Vector3D &view_dir)
@@ -268,14 +252,14 @@ Colour GeometryNode::lightsContribution(
     Colour c;
     if (render_mode == "photon map") { // only render photon map
         double irrad[3];
-        s_renderer->getPhotonMap()->irradiance_estimate(irrad, (ip.m_point-Point3D()).getRaw(), (ip.m_normal-Vector3D()).getRaw(), s_renderer->getPhotonSearchRadius(), (int)s_renderer->getNumSearchPhotons());
+        s_renderer->getPhotonMap()->irradiance_estimate(irrad, (ip.m_point-Point3D()).getRaw(), (normal-Vector3D()).getRaw(), s_renderer->getPhotonSearchRadius(), (int)s_renderer->getNumSearchPhotons());
         c = Colour(irrad[0], irrad[1], irrad[2]);
     } else if (render_mode == "ray tracing") { // only render ray tracing
-        c = m_material->getColour(view_dir, visible_lights, ambient, ip, ip.m_owner->get_primitive());
+        c = m_material->getColour(view_dir, visible_lights, ambient, ip, normal, ip.m_owner->get_primitive());
     } else { // "all", render both photon map and ray tracing
         double irrad[3];
-        s_renderer->getPhotonMap()->irradiance_estimate(irrad, (ip.m_point-Point3D()).getRaw(), (ip.m_normal-Vector3D()).getRaw(), s_renderer->getPhotonSearchRadius(), (int)s_renderer->getNumSearchPhotons());
-        c = Colour(irrad[0], irrad[1], irrad[2]) + m_material->getColour(view_dir, visible_lights, ambient, ip, ip.m_owner->get_primitive());
+        s_renderer->getPhotonMap()->irradiance_estimate(irrad, (ip.m_point-Point3D()).getRaw(), (normal-Vector3D()).getRaw(), s_renderer->getPhotonSearchRadius(), (int)s_renderer->getNumSearchPhotons());
+        c = Colour(irrad[0], irrad[1], irrad[2]) + m_material->getColour(view_dir, visible_lights, ambient, ip, normal, ip.m_owner->get_primitive());
     }
     return c;
 }

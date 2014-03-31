@@ -15,11 +15,13 @@ Light::Light(
              const Point3D &position,
              const Vector3D &attenuation,
              size_t num_photons,
-             double photon_power) :
+             double photon_power,
+             double power_bias) :
     m_colour(colour),
     m_position(position),
     m_num_photons(num_photons),
-    m_photon_power(photon_power)
+    m_photon_power(photon_power),
+    m_power_bias(power_bias)
 {
     m_falloff[0] = attenuation[0];
     m_falloff[1] = attenuation[1];
@@ -71,6 +73,11 @@ double Light::getPower() const
     return m_photon_power;
 }
 
+double Light::getBias() const
+{
+    return m_power_bias;
+}
+
 std::ostream& operator<<(std::ostream& out, const Light& l)
 {
     out << "colour: " << l.m_colour << ",\n\tposition: " << l.m_position << ",\n\tnum photons: " << l.m_num_photons << ",\n\tphoton power: " << l.m_photon_power << ",\n\tfalloff: {" << l.m_falloff[0] << ", " << l.m_falloff[1] << ", " << l.m_falloff[2] << "}";
@@ -84,8 +91,9 @@ PointLight::PointLight(
                        const Point3D &position,
                        const Vector3D &attenuation,
                        size_t num_photons,
-                       double photon_power) :
-    Light(colour, position, attenuation, num_photons, photon_power)
+                       double photon_power,
+                       double power_bias) :
+    Light(colour, position, attenuation, num_photons, photon_power, power_bias)
 {}
 
 PointLight::~PointLight()
@@ -102,8 +110,9 @@ SquareLight::SquareLight(
                          const Vector3D &attenuation,
                          size_t num_photons,
                          double photon_power,
+                         double power_bias,
                          double size) :
-    Light(colour, position, attenuation, num_photons, photon_power),
+    Light(colour, position, attenuation, num_photons, photon_power, power_bias),
     m_size(size)
 {}
 

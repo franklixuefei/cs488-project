@@ -148,7 +148,8 @@ private:
                                   double refl_id,
                                   int recursive_depth) const;
     Colour lightsContribution(
-                              const IntersectionPoint& ip, 
+                              const IntersectionPoint& ip,
+                              const Vector3D &normal,
                               const std::list<Light*>& lights,
                               const Colour &ambient,
                               const Vector3D &view_dir);

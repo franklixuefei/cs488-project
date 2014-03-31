@@ -88,11 +88,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "cs488-proj/scene.cpp"
-            timestampString = "417891897.812438"
+            timestampString = "417994888.946361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "208"
-            endingLineNumber = "208"
+            startingLineNumber = "191"
+            endingLineNumber = "191"
             landmarkName = "GeometryNode::refractionContribution( const Vector3D&amp; view_dir, const Vector3D&amp; normal, const Point3D&amp; start, const std::list&lt;Light*&gt;&amp; lights, const Colour &amp;ambient, double refl_id, double &amp;reflectance, int recursive_depth)"
             landmarkType = "5">
          </BreakpointContent>
@@ -104,11 +104,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "cs488-proj/scene.cpp"
-            timestampString = "417891897.812438"
+            timestampString = "417994888.946361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "209"
-            endingLineNumber = "209"
+            startingLineNumber = "192"
+            endingLineNumber = "192"
             landmarkName = "GeometryNode::refractionContribution( const Vector3D&amp; view_dir, const Vector3D&amp; normal, const Point3D&amp; start, const std::list&lt;Light*&gt;&amp; lights, const Colour &amp;ambient, double refl_id, double &amp;reflectance, int recursive_depth)"
             landmarkType = "5">
          </BreakpointContent>
@@ -214,11 +214,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "cs488-proj/scene.cpp"
-            timestampString = "417843984.281175"
+            timestampString = "417994888.946361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172">
+            startingLineNumber = "155"
+            endingLineNumber = "155">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -228,12 +228,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "cs488-proj/scene.cpp"
-            timestampString = "417891897.812438"
+            timestampString = "417994888.946361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "263"
-            endingLineNumber = "263"
-            landmarkName = "GeometryNode::lightsContribution( const IntersectionPoint&amp; ip, const std::list&lt;Light*&gt;&amp; lights, const Colour &amp;ambient, const Vector3D &amp;view_dir)"
+            startingLineNumber = "247"
+            endingLineNumber = "247"
+            landmarkName = "GeometryNode::lightsContribution( const IntersectionPoint&amp; ip, const Vector3D &amp;normal, const std::list&lt;Light*&gt;&amp; lights, const Colour &amp;ambient, const Vector3D &amp;view_dir)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

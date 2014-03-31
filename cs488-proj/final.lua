@@ -68,5 +68,5 @@ gr.render(scene,
       'scene.png', 600, 600,
       {0, 0, 10}, {0, 0, -1}, {0, 1, 0}, 50,
       {0.4, 0.4, 0.4}, {
-        gr.light({0, 2.45, 3.167}, {1, 1, 1}, {1, 0, 0}, 10000000, 64, 'square', 1.5) -- pos, colour, attenuation, num photons, power of initial photons, light type ('square','round','point'), size(if non point light).
-      }, 3, 0.1, 3000, 'photon map', 32, 'pinhole', 180.0, 1) -- num recur, search radius, num photons per search area, render mode, num threads, eye mode, max psi for fisheye, num sqrt(samples) per pixel for stochastic rendering
+        gr.light({0, 2.45, 3.167}, {1, 1, 1}, {1, 0, 0}, 500000, 64, 1, 'square', 1.5) -- pos, colour, attenuation, num photons, power of initial photons, light type ('square','round','point'), power bias, size(if non point light).
+      }, 3, 0.1, 800, 'photon map', 32, 'pinhole', 180.0, 1) -- num recur, search radius, num photons per search area, render mode, num threads, eye mode, max psi for fisheye, num sqrt(samples) per pixel for stochastic rendering

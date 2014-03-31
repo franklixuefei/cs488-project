@@ -358,16 +358,18 @@ int gr_light_cmd(lua_State* L)
     
     double photon_power = luaL_checknumber(L, 5);
     
-    string type = luaL_checkstring(L, 6);
+    double power_bias = luaL_checknumber(L, 6);
+    
+    string type = luaL_checkstring(L, 7);
     
     Colour lightColour = Colour(col[0], col[1], col[2]);
     Point3D position = Point3D(pos[0], pos[1], pos[2]);
     Vector3D attenuation = Vector3D(falloff[0], falloff[1], falloff[2]);
     if (type == "point") {
-        data->light = new PointLight(lightColour, position, attenuation, num_photons, photon_power);
+        data->light = new PointLight(lightColour, position, attenuation, num_photons, photon_power, power_bias);
     } else if (type == "square") {
-        double size = luaL_checknumber(L, 7);
-        data->light = new SquareLight(lightColour, position, attenuation, num_photons, photon_power, size);
+        double size = luaL_checknumber(L, 8);
+        data->light = new SquareLight(lightColour, position, attenuation, num_photons, photon_power, power_bias, size);
     }
     luaL_newmetatable(L, "gr.light");
     lua_setmetatable(L, -2);
@@ -454,10 +456,14 @@ int gr_material_cmd(lua_State* L)
     if (refractive_index > 999999.0) {
         refractive_index = DBL_MAX;
     }
+    
+    const char* bump_file = luaL_checkstring(L, 6);
+    
     data->material = new BasicPhongMaterial(Colour(kd[0], kd[1], kd[2]),
                                             Colour(ks[0], ks[1], ks[2]),
                                             Colour(kt[0], kt[1], kt[2]),
-                                            shininess, refractive_index);
+                                            shininess, refractive_index,
+                                            bump_file);
     
     luaL_newmetatable(L, "gr.material");
     lua_setmetatable(L, -2);
@@ -487,10 +493,13 @@ int gr_texture_material_cmd(lua_State* L)
     if (refractive_index > 999999.0) {
         refractive_index = DBL_MAX;
     }
+        const char* bump_file = luaL_checkstring(L, 6);
+    
     data->material = new ImageTextureMaterial(filename,
                                               Colour(ks[0], ks[1], ks[2]),
                                               Colour(kt[0], kt[1], kt[2]),
-                                              shininess,refractive_index);
+                                              shininess,refractive_index,
+                                              bump_file);
     
     luaL_newmetatable(L, "gr.material");
     lua_setmetatable(L, -2);
