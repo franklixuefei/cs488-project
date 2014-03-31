@@ -6,6 +6,7 @@
 #include <float.h>
 #include <climits>
 #include "renderer.hpp"
+#include "formulas.hpp"
 #include <cassert>
 
 SceneNode::SceneNode(const std::string& name)
@@ -25,18 +26,18 @@ bool SceneNode::intersect(
                           Colour& c,
                           const std::list<Light*>& lights,
                           const Colour &ambient,
-                          Renderer *renderer, double refl_id)
+                          Renderer *renderer,
+                          double refl_id,
+                          IntersectionPoint &ip)
 {
     if (!s_renderer) {
         s_renderer = renderer;
     }
-    IntersectionPoint ip;
     if (intersect(eye, ray, ip, refl_id)) {
         
         c = ip.m_owner->getColourForPoint(eye, ip, lights, ambient, refl_id);
         return true;
     }
-    
     return false;
 }
 
@@ -134,30 +135,24 @@ Colour GeometryNode::getColourForPoint(
     
     Colour c(0,0,0);
     
-    Vector3D view_dir = eye - ip.m_point;
+    Vector3D view_dir = ip.m_point - eye; // pointing to incident point
     view_dir.normalize();
 #warning hard-coded reflectance.
-    double reflectance = calcFresnelReflectance();
-    
-    c = c + ip.m_owner->get_material()->getSpecular() * reflectance * reflectionContribution(view_dir, ip.m_orig_normal, ip.m_point, lights, ambient, refl_id, recursive_depth);
+    double reflectance = 1.0;
     if (ip.m_owner->get_material()->getRefractiveIndex() != DBL_MAX) {
-        c = c + (1.0 - reflectance) * refractionContribution(-1.0 * view_dir, ip.m_orig_normal, ip.m_point, lights, ambient, refl_id, recursive_depth);
+        Colour crefr = refractionContribution(view_dir, ip.m_orig_normal, ip.m_point, lights, ambient, refl_id, reflectance, recursive_depth);
+        c = c + (1.0 - reflectance) * crefr;
     }
+    c = c + ip.m_owner->get_material()->getSpecular() * reflectance * reflectionContribution(view_dir, ip.m_orig_normal, ip.m_point, lights, ambient, refl_id, recursive_depth);
     
-#warning TODO: refraction contribution
-    
-    
-    c = c + lightsContribution(ip, lights, ambient, view_dir, ip.m_normal);
+    c = c + lightsContribution(ip, lights, ambient, view_dir);
     return c;
 }
 
-double GeometryNode::calcFresnelReflectance()
-{
-#warning TOOD: implement this. (if refl_id == DBL_MAX, reflectance = 1.0)
-    return 0;
-}
-
 /*
+ 
+ 
+ 
  Vec x=r.o+r.d*t, n=(x-obj.p).norm(), nl=n.dot(r.d)<0?n:n*-1, f=obj.c;
  double p = f.x>f.y && f.x>f.z ? f.x : f.y>f.z ? f.y : f.z; // max refl
  
@@ -175,35 +170,40 @@ double GeometryNode::calcFresnelReflectance()
  */
 
 Colour GeometryNode::refractionContribution(
-                              const Vector3D& view_dir,
-                              const Vector3D& normal,
-                              const Point3D& start,
-                              const std::list<Light*>& lights,
-                              const Colour &ambient,
-                              double refl_id,
-                              int recursive_depth) const
+                                            const Vector3D& view_dir,
+                                            const Vector3D& normal,
+                                            const Point3D& start,
+                                            const std::list<Light*>& lights,
+                                            const Colour &ambient,
+                                            double refl_id,
+                                            double &reflectance,
+                                            int recursive_depth) const
 {
-    Vector3D nl= normal.dot(view_dir) < 0 ? normal : -1.0 * normal;// n.dot(r.d)<0?n:n*-1
-    nl.normalize();
-    Vector3D n = normal;
-    n.normalize();
     double hitMatReflID = m_material->getRefractiveIndex();
 #warning ray is hitting out of the object (to the air), assuming no two intact objects.
-    double nnt;
-    bool into = n.dot(nl)>0;
-    if (hitMatReflID == refl_id) {
-        nnt = hitMatReflID / 1.0; // hitting out
+    Vector3D t_dir;
+    double na, nb;
+    bool into = (hitMatReflID != refl_id);
+    if ((normal.dot(view_dir) < 0)) { // ray going in
+//        assert(hitMatReflID != refl_id);
+        na = refl_id;
+        nb = hitMatReflID;
     } else {
-        nnt = refl_id / hitMatReflID;
+//        assert(hitMatReflID == refl_id);
+        na = hitMatReflID;
+        nb = 1.0;
     }
-    double ddn = view_dir.dot(nl);
-    double cos2t = 1.0 - nnt*nnt*(1-ddn*ddn);
-    if ((cos2t) < SMALL_EPSILON) { // total internal reflection);
-        return reflectionContribution(view_dir, normal, start, lights, ambient, refl_id, REFLECTION_RECURSIVE_DEPTH);
-    }
-    Vector3D t_dir = nnt * view_dir - (into? 1.0 : -1.0) * (ddn * nnt + sqrt(cos2t)) * n;
-//    t_dir = view_dir;
+    double nnt = DBL_MAX, ddn = DBL_MAX;
+    Vector3D n = normal;
+    n.normalize();
+    bool canRefract = Formulas::SnellRefraction(view_dir, normal, na, nb, t_dir, nnt, ddn);
     t_dir.normalize();
+// calculate reflectance using Fresnel's Formula
+    reflectance = Formulas::schlickApproxFresnelReflectance(1.0, hitMatReflID, (into ? -1.0 * ddn : t_dir.dot(n)));
+    if (!canRefract) { // total internal reflection);
+        return reflectance * reflectionContribution(view_dir, normal, start, lights, ambient, refl_id, recursive_depth);
+    }
+
     IntersectionPoint ip;
     bool hit = s_renderer->get_root()->intersect(start, t_dir, ip, into? hitMatReflID : 1.0);
     if (hit) {
@@ -224,7 +224,7 @@ Colour GeometryNode::reflectionContribution(const Vector3D& view_dir, // incomin
     Vector3D n = normal;
     n.normalize();
     if (recursive_depth >= 0) {
-        Vector3D reflected_dir = -1 * view_dir + 2 * view_dir.dot(n) * n;
+        Vector3D reflected_dir = Formulas::perfectReflection(n, view_dir);
         IntersectionPoint ip;
         
         if (SceneNode::s_renderer->get_root()->intersect(start, reflected_dir, ip, refl_id)) {
@@ -241,20 +241,41 @@ Colour GeometryNode::lightsContribution(
                                         const IntersectionPoint& ip,
                                         const std::list<Light*>& lights,
                                         const Colour &ambient,
-                                        const Vector3D &view_dir,
-                                        const Vector3D &normal)
+                                        const Vector3D &view_dir)
 {
+
     std::list<Light*> visible_lights;
     for (std::list<Light*>::const_iterator it = lights.begin(); it != lights.end(); ++it) {
-        Vector3D light_dir = (*it)->position - ip.m_point;
+        PointLight *pl = dynamic_cast<PointLight*>(*it);
+        SquareLight *sl = dynamic_cast<SquareLight*>(*it);
+        if (pl) {
+            
+        } else if (sl) {
+            #warning TODO: implement soft shadow here!!!
+        }
+        Vector3D light_dir = (*it)->getPosition() - ip.m_point;
+        double lightDistSq = light_dir.length2();
         light_dir.normalize();
         IntersectionPoint temp;
 #warning NOTE: if refl_id is DBL_MAX, then either this is an opaque object or we are tracing towards lights, or this is a bounding box.
-        if (!SceneNode::s_renderer->get_root()->intersect(ip.m_point, light_dir, temp, DBL_MAX)) { // this light is visible.
+        bool ObjectInTheWay = SceneNode::s_renderer->get_root()->intersect(ip.m_point, light_dir, temp, DBL_MAX);
+        if (!ObjectInTheWay || (temp.m_point - ip.m_point).length2() - lightDistSq > SMALL_EPSILON) { // this light is visible.
             visible_lights.push_back(*it);
         }
         
     }
-    
-    return m_material->getColour(normal, view_dir, visible_lights, ambient, ip, ip.m_owner->get_primitive());
+    const string &render_mode = s_renderer->getRenderMode();
+    Colour c;
+    if (render_mode == "photon map") { // only render photon map
+        double irrad[3];
+        s_renderer->getPhotonMap()->irradiance_estimate(irrad, (ip.m_point-Point3D()).getRaw(), (ip.m_normal-Vector3D()).getRaw(), s_renderer->getPhotonSearchRadius(), (int)s_renderer->getNumSearchPhotons());
+        c = Colour(irrad[0], irrad[1], irrad[2]);
+    } else if (render_mode == "ray tracing") { // only render ray tracing
+        c = m_material->getColour(view_dir, visible_lights, ambient, ip, ip.m_owner->get_primitive());
+    } else { // "all", render both photon map and ray tracing
+        double irrad[3];
+        s_renderer->getPhotonMap()->irradiance_estimate(irrad, (ip.m_point-Point3D()).getRaw(), (ip.m_normal-Vector3D()).getRaw(), s_renderer->getPhotonSearchRadius(), (int)s_renderer->getNumSearchPhotons());
+        c = Colour(irrad[0], irrad[1], irrad[2]) + m_material->getColour(view_dir, visible_lights, ambient, ip, ip.m_owner->get_primitive());
+    }
+    return c;
 }

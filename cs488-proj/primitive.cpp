@@ -739,14 +739,14 @@ CornellBox::CornellBox(double width, double height)
 	vertices.push_back(Point3D(pos[0], pos[1] + m_height, pos[2] + m_depth));
     
 	std::vector<std::vector<int> > faces;
-	int f[4][4] = {
+	int f[5][4] = {
 		{4, 5, 1, 0}, 	 // bottom
 		{1, 5, 6, 2}, 	 // right
 		{4, 0, 3, 7}, 	 // left
-//		{3, 2, 6, 7}, 	 // top
+		{3, 2, 6, 7}, 	 // top
 		{0, 1, 2, 3}	 // rear
 	};
-	for (int i = 0; i < 4; ++i) {
+	for (int i = 0; i < 5; ++i) {
 		std::vector<int> face;
 		for (int j = 0; j < 4; ++j) {
 			face.push_back(f[i][j]);

@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <cstdlib>
-
+#include "formulas.hpp"
 void* thread_start(void* data)
 {
   Args *args = (Args*) data;
@@ -11,16 +11,23 @@ void* thread_start(void* data)
 }
 
 Renderer::Renderer(
-	SceneNode* root,
-	int width, int height,
-	const Point3D& eye, const Vector3D& view,
-	const Vector3D& up, double fov,
-	const Colour& ambient,
-	const std::list<Light*>& lights,
-    string type, // pinhole or fisheye
-    size_t pixelSize
+                   SceneNode* root,
+                   int width, int height,
+                   const Point3D& eye, const Vector3D& view,
+                   const Vector3D& up, double fov,
+                   const Colour& ambient,
+                   const std::list<Light*>& lights,
+                   size_t num_photon_recursion,
+             double photon_search_radius,
+                   size_t num_search_photons,
+                   const std::string& mode,
+                   size_t num_threads,
+                   const std::string& type,
+                   double max_psi,
+                   size_t pixelSize
 ) :
 	m_img(Image(width, height, 3)),
+    m_bg_img(Image(width, height, 3)),
 	m_root(root),
 	m_width(width),
 	m_height(height),
@@ -32,22 +39,38 @@ Renderer::Renderer(
 	m_screen_distance(((double)std::max(width, height) / 2.0) / tan(M_PI * fov / 360.0)),
 	m_ambient(ambient),
 	m_lights(lights),
-    m_photon_map(new PhotonMap(MAX_NUM_PHOTONS)),
+    m_photon_recursion(num_photon_recursion),
+    m_photon_search_radius(photon_search_radius),
+    m_num_search_photons(num_search_photons),
+    m_render_mode(mode),
+    m_num_threads(num_threads),
+    m_render_type(type),
+    m_max_psi(max_psi),
+    m_pixel_size(pixelSize),
     m_pinhole_camera(NULL),
     m_fisheye_camera(NULL)
 {
+    size_t total_num_init_photons = 0;
+    for (std::list<Light*>::const_iterator it = m_lights.cbegin(); it != m_lights.cend(); ++it) {
+        total_num_init_photons += (*it)->getNumPhotons();
+    }
+    std::cerr << "total initial number of photons: " << total_num_init_photons << endl;
+    m_photon_map = new PhotonMap((int)(total_num_init_photons*m_photon_recursion));
 	m_view.normalize();
 	m_up.normalize();
 	m_left.normalize();
-    if (type == "pinhole") {
+    if (m_render_type == "pinhole") {
         m_pinhole_camera = new PinholeCamera(
-            new CameraProperties(m_width, m_height, m_screen_distance, m_view, m_left, m_up, pixelSize, pixelSize*pixelSize)
+            new CameraProperties(m_width, m_height, m_screen_distance, m_view, m_left, m_up, m_pixel_size, m_pixel_size*m_pixel_size)
+        );
+    } else if (m_render_type == "fisheye") {
+        m_fisheye_camera = new FishEyeCamera(
+            new CameraProperties(m_width, m_height, m_screen_distance, m_view, m_left, m_up, m_pixel_size, m_pixel_size*m_pixel_size),
+            m_max_psi
         );
     } else {
-        m_fisheye_camera = new FishEyeCamera(
-            new CameraProperties(m_width, m_height, m_screen_distance, m_view, m_left, m_up, pixelSize, pixelSize*pixelSize),
-            180.0 // max_psi
-        );
+        cerr << "wrong render type: " + m_render_type << endl;
+        exit(1);
     }
     
 }
@@ -61,54 +84,57 @@ Renderer::~Renderer()
 
 void Renderer::build_photon_map()
 {
-    Light hard_coded_light;
     Point3D orig;
     Vector3D ray_dir;
-#warning need to be plugged in lua parser
-    hard_coded_light.position = Point3D(0, 2.45, 4.167);
-    double x, y, z;
-    for (int i = 0; i < INIT_NUM_PHOTONS; ++i) {
-        x = 1.5 * rand() / RAND_MAX - 0.75; // -0.75 - 0.75
-        y = 0; // -0.75 - 0.75
-        z = 1.5 * rand() / RAND_MAX - 0.75; // -0.75 - 0.75
-        Vector3D offset(x, y, z);
-        orig = hard_coded_light.position + offset;
-        do {
-            x = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
-            y = -(1.0 * rand() / RAND_MAX);
-            z = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
-        } while (x*x + y*y + z*z > 1.0 || y == 0);
-        
-        ray_dir = Vector3D(x, y, z);
-        ray_dir.normalize();
-        Colour power = Colour(100.0, 100.0, 100.0);
-//        m_photon_map->store(power.getRaw(), orig.getRaw(), Vector3D().getRaw());
-        trace_photons(orig, ray_dir, power, 1.0, 0);
+    for (std::list<Light*>::const_iterator it = m_lights.cbegin(); it != m_lights.cend(); ++it) { // for each light source
+        Light *light = *it;
+        double x, y, z;
+        for (int i = 0; i < light->getNumPhotons(); ++i) {
+            SquareLight *squareLight = dynamic_cast<SquareLight*>(light);
+            PointLight *pointLight = dynamic_cast<PointLight*>(light);
+            if (squareLight) {
+                double lightSize = squareLight->getSize();
+#warning NOTE: for now only downward lights considered
+                x = lightSize * rand() / RAND_MAX - lightSize/2.0;
+                y = 0;
+                z = lightSize * rand() / RAND_MAX - lightSize/2.0;
+                Vector3D offset(x, y, z);
+                orig = squareLight->getPosition() + offset;
+            } else if (pointLight) {
+                orig = pointLight->getPosition();
+            }
+#warning TODO: more light types here...
+            do {
+                x = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
+                y = -(1.0 * rand() / RAND_MAX);
+                z = (1.0 * rand() / RAND_MAX - 0.5) * 2.0;
+            } while (x*x + y*y + z*z > 1.0 || y == 0);
+            ray_dir = Vector3D(x, y, z);
+            ray_dir.normalize();
+            Colour power = light->getPower() * light->getColour();
+            m_photon_map->store(power.getRaw(), orig.getRaw(), (-1.0 * ray_dir).getRaw());
+            trace_photons(orig, ray_dir, power, 1.0, 0);
+        }
+        m_photon_map->scale_photon_power(1.0 / (double)light->getNumPhotons());
     }
-    m_photon_map->scale_photon_power(1.0 / (double)INIT_NUM_PHOTONS);
     m_photon_map->balance();
 }
 
-
 Image Renderer::render()
 {
-//    build_photon_map();
-    cerr << "photons: " << m_photon_map->get_stored_photons() << endl;
-//    Photon* photons = m_photon_map->getPhotons();
-//    for (int i = 0; i < m_photon_map->get_stored_photons(); ++i) {
-//        cerr << photons[i].pos[0] << ", " << photons[i].pos[1] <<  ", " << photons[i].pos[2] << endl;
-//    }
+    if (m_render_mode == "all" || m_render_mode == "photon map") {
+        build_photon_map();
+        cerr << "num stored photons: " << m_photon_map->get_stored_photons() << endl;
+    }
     
-	size_t numThreads = 32;
 	std::vector<pthread_t*> threads;
-	struct Args* args = new Args[numThreads];
-	unsigned int i = 0;
-	for (;i < numThreads; ++i) {
+	struct Args* args = new Args[m_num_threads];
+	for (unsigned int i = 0 ;i < m_num_threads; ++i) {
 		pthread_t* thread = new pthread_t;
 		threads.push_back(thread);
 		args[i].renderer = this;
 		args[i].start_row = i;
-		args[i].render_size = numThreads;
+		args[i].render_size = m_num_threads;
 		pthread_create(thread, NULL, &thread_start, (void *)&args[i]);
 	}
 	for (unsigned int i = 0; i < threads.size(); ++i) {
@@ -139,18 +165,22 @@ Colour Renderer::background(int x, int y)
 }
 
 BasicRenderer::BasicRenderer(
-              SceneNode* root,
-              // Image size
-              int width, int height,
-              // Viewing parameters
-              const Point3D& eye, const Vector3D& view,
-              const Vector3D& up, double fov,
-              // Lighting parameters
-              const Colour& ambient,
-              const std::list<Light*>& lights,
-                const string& type
-              ) :
-    Renderer(root,width,height,eye,view,up,fov,ambient,lights, type, 1)
+                             SceneNode* root,
+                             int width, int height,
+                             const Point3D& eye, const Vector3D& view,
+                             const Vector3D& up, double fov,
+                             const Colour& ambient,
+                             const std::list<Light*>& lights,
+                             size_t num_photon_recursion,
+             double photon_search_radius,
+                             size_t num_search_photons,
+                             const std::string& mode,
+                             size_t num_threads,
+                             const std::string& type,
+                             double max_psi
+                             ) :
+    Renderer(root,width,height,eye,view,up,fov,ambient,lights,num_photon_recursion,photon_search_radius,num_search_photons,mode,num_threads,type,max_psi,1)
+
 {}
 
 BasicRenderer::~BasicRenderer()
@@ -163,17 +193,9 @@ bool BasicRenderer::getColourForPixel(int x, int y, Colour & c)
     double dx = (double)m_width / 2.0 - (double)x;
 	double dy = (double)m_height / 2.0 - (double)y;
     if (camera->gen_ray(dx, dy, ray_dir)) {
-        if (m_root->intersect(m_eye, ray_dir, c, m_lights, m_ambient, this, 1.0)) {
-//        return photon_intersect(ray_dir, c);
-            IntersectionPoint ip;
-            double irrad[3];
-            if (m_root->intersect(m_eye, ray_dir, ip, 1.0)) {
-//                m_photon_map->irradiance_estimate(irrad, ip.m_point.getRaw(), ip.m_normal.getRaw(), 0.1, 200);
-#warning need to scale up the colour a bit...
-//                c = c + Colour(irrad[0], irrad[1], irrad[2]);
-                //            cerr << c << endl;
-                return true;
-            }
+        IntersectionPoint ip; // not used
+        if (m_root->intersect(m_eye, ray_dir, c, m_lights, m_ambient, this, 1.0, ip)) {
+            return true;
         }
     }
     return false;
@@ -199,19 +221,22 @@ bool BasicRenderer::photon_intersect(const Vector3D &ray_dir, Colour &c)
 }
 
 StochasticRenderer::StochasticRenderer(
-                   SceneNode* root,
-                   // Image size
-                   int width, int height,
-                   // Viewing parameters
-                   const Point3D& eye, const Vector3D& view,
-                   const Vector3D& up, double fov,
-                   // Lighting parameters
-                   const Colour& ambient,
-                   const std::list<Light*>& lights,
-                    const string& type,
-                    size_t pixelSize
-                ):
-    Renderer(root,width,height,eye,view,up,fov,ambient,lights, type, pixelSize),
+                                       SceneNode* root,
+                                       int width, int height,
+                                       const Point3D& eye, const Vector3D& view,
+                                       const Vector3D& up, double fov,
+                                       const Colour& ambient,
+                                       const std::list<Light*>& lights,
+                                       size_t num_photon_recursion,
+             double photon_search_radius,
+                                       size_t num_search_photons,
+                                       const std::string& mode,
+                                       size_t num_threads,
+                                       const std::string& type,
+                                       double max_psi,
+                                       size_t pixelSize
+                                       ):
+    Renderer(root,width,height,eye,view,up,fov,ambient,lights,num_photon_recursion,photon_search_radius,num_search_photons,mode,num_threads,type,max_psi,pixelSize),
     m_pixel_size(pixelSize)
 {}
 
@@ -243,7 +268,8 @@ bool StochasticRenderer::getColourForPixel(int x, int y, Colour &c)
             
             Colour sample_colour = background(x, y);
             if (camera->gen_ray(dx, dy, ray_dir)) {
-                if  (!m_root->intersect(m_eye, ray_dir, sample_colour, m_lights, m_ambient, this, 1.0))
+                IntersectionPoint ip; // not used
+                if  (!m_root->intersect(m_eye, ray_dir, sample_colour, m_lights, m_ambient, this, 1.0, ip))
                 {
                     continue;
                 }
@@ -267,61 +293,103 @@ bool StochasticRenderer::getColourForPixel(int x, int y, Colour &c)
 
 /*===================================Photon Mapping ==============================*/
 
+PhotonMap* Renderer::getPhotonMap() const
+{
+    return m_photon_map;
+}
+
+double Renderer::getPhotonSearchRadius() const
+{
+    return m_photon_search_radius;
+}
+
+size_t Renderer::getNumSearchPhotons() const
+{
+    return m_num_search_photons;
+}
+
+const string & Renderer::getRenderMode() const
+{
+    return m_render_mode;
+}
+
 void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double refl_id, size_t recur_depth)
 {
-    if (recur_depth > MAX_PHOTON_RECURSION) {
+    if (recur_depth > m_photon_recursion) {
         return;
     }
     IntersectionPoint ip;
     if (!m_root->intersect(orig, dir, ip, refl_id)) {
         return;
     }
-//    cerr << ip.m_owner->getName() << endl;
+
+    Vector3D nl = ip.m_orig_normal.dot(dir) < 0 ? ip.m_orig_normal : -1.0 * ip.m_orig_normal;
+    
+    double hitMatReflID = ip.m_owner->get_material()->getRefractiveIndex();
+    double reflectance = 1.0; // default the reflectance to 1.0 (full reflection)
+    double transmission = 1.0 - reflectance;
+    Vector3D srefl_dir = Formulas::perfectReflection(nl, dir); // specular reflection
+    srefl_dir.normalize();
     Colour kd = ip.m_owner->get_material()->getDiffuse(ip.m_owner->get_primitive(), ip.m_orig_point);
-    double kd_avg = (kd.R() + kd.G() + kd.B()) / 3.0;
-    double refl_rand = 1.0 * rand() / RAND_MAX;
-    if (refl_rand < kd_avg) { // reflect
-        if (recur_depth > 0) m_photon_map->store((kd*power).getRaw(), ip.m_point.getRaw(), dir.getRaw());
-        Colour refl_power = power * (kd * (1.0 / kd_avg));
-//        Vector3D nl = ip.m_orig_normal.dot(dir) < 0 ? ip.m_orig_normal : -1.0 * ip.m_orig_normal;
-        Vector3D drefl_dir = calc_diffuse_reflection(ip.m_orig_normal);
-        drefl_dir.normalize();
-        trace_photons(ip.m_point, drefl_dir, power, refl_id, recur_depth+1);
+    if (hitMatReflID != DBL_MAX) { // translucent object
+#warning ray is hitting out of the object (to the air), assuming no two intact objects.
+        Vector3D t_dir;
+        double na, nb;
+        bool into = true;
+        if ((into = ip.m_normal.dot(dir) < 0)) { // ray going in
+            na = refl_id;
+            nb = hitMatReflID;
+        } else {
+            na = hitMatReflID;
+            nb = 1.0;
+        }
+        double nnt, ddn;
+        
+        bool canRefract = Formulas::SnellRefraction(dir, ip.m_normal, na, nb, t_dir, nnt, ddn);
+
+        if (!canRefract) { // total internal reflection);
+            trace_photons(ip.m_point, srefl_dir, power, refl_id, recur_depth + 1);
+        } else { // can refract
+            t_dir.normalize();
+            // calculate reflectance using Fresnel's Formula
+            reflectance = Formulas::schlickApproxFresnelReflectance(1.0, hitMatReflID, (into ? -1.0 * ddn : t_dir.dot(ip.m_normal)));
+            transmission = 1.0 - reflectance;
+            // Russion Roulette
+            double p = 0.25 + 0.5 * reflectance;
+            double reflP = reflectance / p;
+            double transP = transmission / (1.0 - p);
+            Vector3D refl_dir = Formulas::perfectReflection(ip.m_normal, dir);
+            if (recur_depth > 2) {
+                double rand1 = 1.0 * rand() / RAND_MAX;
+                if (rand1 < p) {
+                    trace_photons(ip.m_point, refl_dir, reflP * power, refl_id, recur_depth + 1);
+                } else {
+                    trace_photons(ip.m_point, t_dir, transP * power * (into?kd:Colour(1,1,1)), into?hitMatReflID:1.0, recur_depth+1);
+                }
+            } else {
+                trace_photons(ip.m_point, refl_dir, reflP * power, refl_id, recur_depth + 1);
+                trace_photons(ip.m_point, t_dir, transP * power, into?hitMatReflID:1.0, recur_depth + 1);
+            }
+        }
+    } else { // non-translucent, specular or diffuse depending on kd_avg
+//        trace_photons(ip.m_point, refl_dir, reflP * power, refl_id, recur_depth + 1);
+        
+        double kd_avg = (kd.R() + kd.G() + kd.B()) / 3.0;
+        double refl_rand = 1.0 * rand() / RAND_MAX;
+        if (refl_rand < kd_avg) { // diffuse reflection
+            /*if (recur_depth > 0)*/ m_photon_map->store((kd*(1.0 / kd_avg)*power).getRaw(), ip.m_point.getRaw(), dir.getRaw());
+#warning can also use cosine weight reflection.
+            Vector3D drefl_dir = Formulas::pureRandomDiffuseReflection(nl);
+            drefl_dir.normalize();
+            // power of each photon remains unchanged, but the amount of photons decreases each time.
+            trace_photons(ip.m_point, drefl_dir, power, refl_id, recur_depth+1);
+        } else { // specular reflection
+            trace_photons(ip.m_point, srefl_dir, power, refl_id, recur_depth+1);
+        }
     }
-#warning TODO: refraction(need to set refl_id) and specular reflection using Russian Roulette
-}
-
-Vector3D Renderer::calc_diffuse_reflection(const Vector3D &n)
-{
-/* perfect diffuse version -- not suitable here - should be used while rendering*/
-//    Vector3D dir;
-//    double rand1 = 1.0 * rand() / RAND_MAX; // [0,1]
-//    double rand2 = 1.0 * rand() / RAND_MAX; // [0,1]
-//    double theta = 2.0 * M_PI * rand1;
-//    double cosPhi = sqrt(rand2);
-//    Vector3D w = n, u = (fabs(w[0]) > 0.1 ? Vector3D(0,1,0) : Vector3D(1,0,0)).cross(w);
-//    u.normalize();
-//    Vector3D v = w.cross(u);
-//    dir = cos(theta)*cosPhi*u + sin(theta)*cosPhi*v + sqrt(1-rand2)*w;
-//    dir.normalize();
-//    return dir;
     
-/* pure random version */
-    double x, y, z;
-    Vector3D dir;
     
-    /* reject any direction that is opposite to the surface normal */
-    do {
-        /* determine new direction by rejection sampling */
-        x = (1.0*rand()/RAND_MAX - 0.5) * 2.0;
-        y = (1.0*rand()/RAND_MAX - 0.5) * 2.0;
-        z = (1.0*rand()/RAND_MAX - 0.5) * 2.0;
-        dir = Vector3D(x, y, z);
-    } while(x*x + y*y + z*z > 1.0 && dir.dot(n) > SMALL_EPSILON);
-
-    return dir;
 }
-
 
 
 

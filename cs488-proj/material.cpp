@@ -1,6 +1,7 @@
 #include "material.hpp"
 #include "primitive.hpp"
-
+#include "formulas.hpp"
+#include <cassert>
 PhongMaterial::PhongMaterial(const Colour& ks, double shininess, double refractive_index)
 : m_ks(ks), m_shininess(shininess), m_refractive_index(refractive_index)
 {
@@ -20,7 +21,6 @@ Colour PhongMaterial::getShininess() const
 }
 
 Colour PhongMaterial::getColour(
-                                const Vector3D& normal,
                                 const Vector3D& view_dir,
                                 const std::list<Light*>& lights,
                                 const Colour& ambient,
@@ -32,25 +32,23 @@ Colour PhongMaterial::getColour(
 	view.normalize();
     
     Colour kd = getDiffuse(primitive, ip.m_orig_point);
-    
+
     Colour c = kd * ambient;
     
     for (std::list<Light*>::const_iterator it = lights.begin(); it != lights.end(); ++it) {
-        Vector3D light_dir = (*it)->position - ip.m_point; // Note this needs to point towards the light.
+        Vector3D light_dir = (*it)->getPosition() - ip.m_point; // Note this needs to point towards the light.
         
         double dist = light_dir.length();
         light_dir.normalize();
-        Vector3D r = -light_dir + 2 * (light_dir.dot(normal)) * normal;
-        
-        Colour contribution = (kd + m_ks * ( pow(r.dot(view), m_shininess) / normal.dot(light_dir) )) *
-        (*it)->colour * light_dir.dot(normal) *
-        (1 / ((*it)->falloff[0] + (*it)->falloff[1] * dist +
-              (*it)->falloff[2] * dist * dist));
+        Vector3D r = Formulas::perfectReflection(ip.m_normal, -1.0 * light_dir);
+        Colour contribution = (kd + m_ks * ( pow(r.dot(view), m_shininess) / ip.m_normal.dot(light_dir) )) *
+        (*it)->getColour() * light_dir.dot(ip.m_normal) *
+        (1 / ((*it)->getAttenuation()[0] + (*it)->getAttenuation()[1] * dist +
+              (*it)->getAttenuation()[2] * dist * dist));
         if (contribution.R() >= 0 && contribution.G() >= 0 && contribution.B() >= 0) {
             c = c + contribution;
         }
     }
-    
     return c;
 }
 

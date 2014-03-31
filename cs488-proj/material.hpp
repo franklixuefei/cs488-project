@@ -20,7 +20,6 @@ public:
     Colour getShininess() const;
     
     Colour getColour(
-                     const Vector3D& normal,
                      const Vector3D& view_dir,
                      const std::list<Light*>& lights,
                      const Colour& ambient,

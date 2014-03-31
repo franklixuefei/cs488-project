@@ -43,7 +43,7 @@
 #include <vector>
 #include "lua488.hpp"
 #include "light.hpp"
-#include "a4.hpp"
+#include "render_main.hpp"
 #include "mesh.hpp"
 using namespace std;
 // Uncomment the following line to enable debugging messages
@@ -349,26 +349,36 @@ int gr_light_cmd(lua_State* L)
     data->light = 0;
     
     
-    Light l;
-    
-    double col[3];
-    get_tuple(L, 1, &l.position[0], 3);
+    double col[3], pos[3], falloff[3];
+    get_tuple(L, 1, pos, 3);
     get_tuple(L, 2, col, 3);
-    get_tuple(L, 3, l.falloff, 3);
+    get_tuple(L, 3, falloff, 3);
     
-    l.colour = Colour(col[0], col[1], col[2]);
+    size_t num_photons = luaL_checknumber(L, 4);
     
-    data->light = new Light(l);
+    double photon_power = luaL_checknumber(L, 5);
     
+    string type = luaL_checkstring(L, 6);
+    
+    Colour lightColour = Colour(col[0], col[1], col[2]);
+    Point3D position = Point3D(pos[0], pos[1], pos[2]);
+    Vector3D attenuation = Vector3D(falloff[0], falloff[1], falloff[2]);
+    if (type == "point") {
+        data->light = new PointLight(lightColour, position, attenuation, num_photons, photon_power);
+    } else if (type == "square") {
+        double size = luaL_checknumber(L, 7);
+        data->light = new SquareLight(lightColour, position, attenuation, num_photons, photon_power, size);
+    }
     luaL_newmetatable(L, "gr.light");
     lua_setmetatable(L, -2);
     
     return 1;
 }
 
+
 // Render a scene
 extern "C"
-int gr_basic_render_cmd(lua_State* L)
+int gr_render_cmd(lua_State* L)
 {
     GRLUA_DEBUG_CALL;
     
@@ -402,67 +412,24 @@ int gr_basic_render_cmd(lua_State* L)
         lua_rawgeti(L, 10, i);
         gr_light_ud* ldata = (gr_light_ud*)luaL_checkudata(L, -1, "gr.light");
         luaL_argcheck(L, ldata != 0, 10, "Light expected");
-        
         lights.push_back(ldata->light);
         lua_pop(L, 1);
     }
     
-    const char* type = luaL_checkstring(L, 11);
+    size_t max_photon_tracing_recursion = luaL_checknumber(L, 11);
+    double photon_search_radius = luaL_checknumber(L, 12);
+    size_t num_search_photons = luaL_checknumber(L, 13);
+    const char* render_mode = luaL_checkstring(L, 14);
+    size_t num_threads = luaL_checknumber(L, 15);
+    const char* eye_type = luaL_checkstring(L, 16);
+    double max_psi = luaL_checknumber(L, 17);
+    size_t pixel_size = luaL_checknumber(L, 18);
     
-    basic_render(root->node, filename, width, height,
+    render(root->node, filename, width, height,
                  eye, view, up, fov,
-                 ambient, lights, type);
-    
-    return 0;
-}
-
-extern "C"
-int gr_stochastic_render_cmd(lua_State* L)
-{
-    GRLUA_DEBUG_CALL;
-    
-    gr_node_ud* root = (gr_node_ud*)luaL_checkudata(L, 1, "gr.node");
-    luaL_argcheck(L, root != 0, 1, "Root node expected");
-    
-    const char* filename = luaL_checkstring(L, 2);
-    
-    int width = luaL_checknumber(L, 3);
-    int height = luaL_checknumber(L, 4);
-    
-    Point3D eye;
-    Vector3D view, up;
-    
-    get_tuple(L, 5, &eye[0], 3);
-    get_tuple(L, 6, &view[0], 3);
-    get_tuple(L, 7, &up[0], 3);
-    
-    double fov = luaL_checknumber(L, 8);
-    
-    double ambient_data[3];
-    get_tuple(L, 9, ambient_data, 3);
-    Colour ambient(ambient_data[0], ambient_data[1], ambient_data[2]);
-    
-    luaL_checktype(L, 10, LUA_TTABLE);
-    int light_count = luaL_getn(L, 10);
-    
-    luaL_argcheck(L, light_count >= 1, 10, "Tuple of lights expected");
-    std::list<Light*> lights;
-    for (int i = 1; i <= light_count; i++) {
-        lua_rawgeti(L, 10, i);
-        gr_light_ud* ldata = (gr_light_ud*)luaL_checkudata(L, -1, "gr.light");
-        luaL_argcheck(L, ldata != 0, 10, "Light expected");
-        
-        lights.push_back(ldata->light);
-        lua_pop(L, 1);
-    }
-    
-    const char* type = luaL_checkstring(L, 11);
-    
-    size_t pixelSize = luaL_checknumber(L, 12);
-    
-    stochastic_render(root->node, filename, width, height,
-                      eye, view, up, fov,
-                      ambient, lights, type, pixelSize);
+                 ambient, lights, max_photon_tracing_recursion,
+                photon_search_radius, num_search_photons, render_mode,
+            num_threads, eye_type, max_psi, pixel_size);
     
     return 0;
 }
@@ -675,8 +642,7 @@ static const luaL_reg grlib_functions[] = {
     {"nh_box", gr_nh_box_cmd},
     {"mesh", gr_mesh_cmd},
     {"light", gr_light_cmd},
-    {"render", gr_basic_render_cmd},
-    {"stochastic_render", gr_stochastic_render_cmd},
+    {"render", gr_render_cmd},
     {"cornell_box", gr_corbox_cmd},
     {"cylinder", gr_cylinder_cmd},
     {"cone", gr_cone_cmd},
@@ -703,8 +669,7 @@ static const luaL_reg grlib_node_methods[] = {
     {"scale", gr_node_scale_cmd},
     {"rotate", gr_node_rotate_cmd},
     {"translate", gr_node_translate_cmd},
-    {"render", gr_basic_render_cmd},
-    {"stochastic_render", gr_stochastic_render_cmd},
+    {"render", gr_render_cmd},
     {0, 0}
 };
 

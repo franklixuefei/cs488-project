@@ -8,8 +8,6 @@
 #include "intersection_point.hpp"
 #include "light.hpp"
 
-#define REFLECTION_RECURSIVE_DEPTH (5)
-
 class Renderer;
 class IntersectionPoint;
 class GeometryNode;
@@ -50,7 +48,8 @@ public:
                    const std::list<Light*>& lights,
                    const Colour &ambient,
                    Renderer *renderer,
-                   double refl_id);
+                   double refl_id,
+                   IntersectionPoint &ip);
     
     virtual bool intersect(const Point3D& eye, const Vector3D& ray, IntersectionPoint& ip, double refl_id) const;
     
@@ -123,7 +122,12 @@ protected:
     PhongMaterial* m_material;
     Primitive* m_primitive;
 private:
-    double calcFresnelReflectance();
+    double calcFresnelReflectance(const Vector3D& view_dir,
+                                  const Vector3D& normal,
+                                  const Point3D& start,
+                                  const std::list<Light*>& lights,
+                                  const Colour &ambient,
+                                  double refl_id);
     
     Colour refractionContribution(
                                   const Vector3D& view_dir,
@@ -132,6 +136,7 @@ private:
                                   const std::list<Light*>& lights,
                                   const Colour &ambient,
                                   double refl_id,
+                                  double &reflectance,
                                   int recursive_depth) const;
     
     Colour reflectionContribution(
@@ -146,8 +151,7 @@ private:
                               const IntersectionPoint& ip, 
                               const std::list<Light*>& lights,
                               const Colour &ambient,
-                              const Vector3D &view_dir,
-                              const Vector3D &normal);
+                              const Vector3D &view_dir);
 };
 
 

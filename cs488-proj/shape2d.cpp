@@ -169,7 +169,7 @@ Disk::~Disk()
 bool Disk::intersect(const Point3D &eye, const Vector3D &ray, IntersectionPoint &ip, double refl_id)
 {
     double t = m_plane.calcDistRatio(eye, ray);
-#warning changed from t<0 to t < SMALL_EPSILON
+    #warning changed from t<0 to t < SMALL_EPSILON
     if (t < SMALL_EPSILON) return false;
     // inside of an object (refraction), assuming all materials have different refl index
     bool false_ray_check = (refl_id != DBL_MAX && ip.m_owner->get_material()->getRefractiveIndex() == refl_id) ?

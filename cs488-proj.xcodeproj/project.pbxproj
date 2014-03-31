@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F111DFE918D8F071001D69D2 /* a4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCB18D8F071001D69D2 /* a4.cpp */; };
+		F111DFE918D8F071001D69D2 /* render_main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCB18D8F071001D69D2 /* render_main.cpp */; };
 		F111DFEA18D8F071001D69D2 /* algebra.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCD18D8F071001D69D2 /* algebra.cpp */; };
 		F111DFEB18D8F071001D69D2 /* image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFCF18D8F071001D69D2 /* image.cpp */; };
 		F111DFEC18D8F071001D69D2 /* light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111DFD218D8F071001D69D2 /* light.cpp */; };
@@ -22,6 +22,7 @@
 		F111DFF918D8F107001D69D2 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F111DFF718D8F107001D69D2 /* liblua.a */; };
 		F111DFFA18D8F107001D69D2 /* libpng12.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F111DFF818D8F107001D69D2 /* libpng12.a */; };
 		F111DFFC18D8F401001D69D2 /* sample.lua in CopyFiles */ = {isa = PBXBuildFile; fileRef = F111DFE218D8F071001D69D2 /* sample.lua */; };
+		F16775A018E7903800C716B8 /* formulas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F167759E18E7903800C716B8 /* formulas.cpp */; };
 		F172F6F518DB815600280883 /* shape2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F172F6F318DB815600280883 /* shape2d.cpp */; };
 		F18D1BE118DF6E6E007ED6FD /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F18D1BDF18DF6E6E007ED6FD /* camera.cpp */; };
 		F1F6D19718D8FEA4006878AE /* photon_map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1F6D19518D8FEA4006878AE /* photon_map.cpp */; };
@@ -42,8 +43,8 @@
 
 /* Begin PBXFileReference section */
 		F109F1C118D8EDC800201A84 /* cs488-proj */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cs488-proj"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F111DFCB18D8F071001D69D2 /* a4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = a4.cpp; sourceTree = "<group>"; };
-		F111DFCC18D8F071001D69D2 /* a4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = a4.hpp; sourceTree = "<group>"; };
+		F111DFCB18D8F071001D69D2 /* render_main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_main.cpp; sourceTree = "<group>"; };
+		F111DFCC18D8F071001D69D2 /* render_main.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = render_main.hpp; sourceTree = "<group>"; };
 		F111DFCD18D8F071001D69D2 /* algebra.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algebra.cpp; sourceTree = "<group>"; };
 		F111DFCE18D8F071001D69D2 /* algebra.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = algebra.hpp; sourceTree = "<group>"; };
 		F111DFCF18D8F071001D69D2 /* image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image.cpp; sourceTree = "<group>"; };
@@ -71,6 +72,8 @@
 		F111DFF718D8F107001D69D2 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../../../../usr/local/lib/liblua.a; sourceTree = "<group>"; };
 		F111DFF818D8F107001D69D2 /* libpng12.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng12.a; path = ../../../../../usr/local/lib/libpng12.a; sourceTree = "<group>"; };
 		F1484D0D18E0C88500ECDB7B /* intersection_point.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intersection_point.hpp; sourceTree = "<group>"; };
+		F167759E18E7903800C716B8 /* formulas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = formulas.cpp; sourceTree = "<group>"; };
+		F167759F18E7903800C716B8 /* formulas.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = formulas.hpp; sourceTree = "<group>"; };
 		F172F6F318DB815600280883 /* shape2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shape2d.cpp; sourceTree = "<group>"; };
 		F172F6F418DB815600280883 /* shape2d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = shape2d.hpp; sourceTree = "<group>"; };
 		F18D1BDF18DF6E6E007ED6FD /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
@@ -115,8 +118,8 @@
 			isa = PBXGroup;
 			children = (
 				F1C30C9E18D916280033D4B2 /* scene.lua */,
-				F111DFCB18D8F071001D69D2 /* a4.cpp */,
-				F111DFCC18D8F071001D69D2 /* a4.hpp */,
+				F111DFCB18D8F071001D69D2 /* render_main.cpp */,
+				F111DFCC18D8F071001D69D2 /* render_main.hpp */,
 				F111DFCD18D8F071001D69D2 /* algebra.cpp */,
 				F111DFCE18D8F071001D69D2 /* algebra.hpp */,
 				F111DFCF18D8F071001D69D2 /* image.cpp */,
@@ -126,6 +129,8 @@
 				F111DFD318D8F071001D69D2 /* light.hpp */,
 				F111DFD418D8F071001D69D2 /* lua488.hpp */,
 				F111DFD518D8F071001D69D2 /* main.cpp */,
+				F167759E18E7903800C716B8 /* formulas.cpp */,
+				F167759F18E7903800C716B8 /* formulas.hpp */,
 				F111DFD718D8F071001D69D2 /* material.cpp */,
 				F111DFD818D8F071001D69D2 /* material.hpp */,
 				F111DFD918D8F071001D69D2 /* mesh.hpp */,
@@ -209,9 +214,10 @@
 				F172F6F518DB815600280883 /* shape2d.cpp in Sources */,
 				F18D1BE118DF6E6E007ED6FD /* camera.cpp in Sources */,
 				F111DFF118D8F071001D69D2 /* polyroots.cpp in Sources */,
+				F16775A018E7903800C716B8 /* formulas.cpp in Sources */,
 				F111DFF318D8F071001D69D2 /* renderer.cpp in Sources */,
 				F111DFEF18D8F071001D69D2 /* material.cpp in Sources */,
-				F111DFE918D8F071001D69D2 /* a4.cpp in Sources */,
+				F111DFE918D8F071001D69D2 /* render_main.cpp in Sources */,
 				F111DFF518D8F071001D69D2 /* scene.cpp in Sources */,
 				F111DFF618D8F071001D69D2 /* transform.cpp in Sources */,
 				F111DFF218D8F071001D69D2 /* primitive.cpp in Sources */,
