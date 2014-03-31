@@ -78,6 +78,7 @@
 		F172F6F418DB815600280883 /* shape2d.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = shape2d.hpp; sourceTree = "<group>"; };
 		F18D1BDF18DF6E6E007ED6FD /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		F18D1BE018DF6E6E007ED6FD /* camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = camera.hpp; sourceTree = "<group>"; };
+		F1C2AF0D18E9D5E600F1DFE9 /* final.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = final.lua; sourceTree = "<group>"; };
 		F1C30C9E18D916280033D4B2 /* scene.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = scene.lua; path = "../../../../Library/Developer/Xcode/DerivedData/cs488-proj-dzmlmavzolkufifyciayonasmrid/Build/Products/Debug/scene.lua"; sourceTree = "<group>"; };
 		F1F6D19518D8FEA4006878AE /* photon_map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = photon_map.cpp; sourceTree = "<group>"; };
 		F1F6D19618D8FEA4006878AE /* photon_map.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = photon_map.hpp; sourceTree = "<group>"; };
@@ -118,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				F1C30C9E18D916280033D4B2 /* scene.lua */,
+				F1C2AF0D18E9D5E600F1DFE9 /* final.lua */,
 				F111DFCB18D8F071001D69D2 /* render_main.cpp */,
 				F111DFCC18D8F071001D69D2 /* render_main.hpp */,
 				F111DFCD18D8F071001D69D2 /* algebra.cpp */,
