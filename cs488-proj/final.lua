@@ -1,14 +1,14 @@
 -- textrue mapped version
 
-mat1 = gr.material({0.7, 1.0, 0.7}, {0, 0, 0}, {0,0,0}, 10, 10000000)
-mat2 = gr.material({0.5, 1, 0.5}, {0.5, 0.7, 0.5}, {0,0,0}, 25, 10000000)
-mat3 = gr.material({1.0, 0.6, 0.1}, {0.5, 0.7, 0.5}, {0,0,0}, 50, 10000000)
-mat4 = gr.material({0.7, 0.6, 1.0}, {0.5, 0.5, 0.8}, {0,0,0}, 25, 10000000)
-mirror = gr.material({0, 0, 0}, {1, 1, 1}, {0,0,0}, 100, 10000000)
-glass = gr.material({0,0,0}, {1,1,1}, {1,1,1} ,100, 1.5) -- kd, ks, the third param is transmitted color, shininess, refraction index
-water = gr.material({0,0,0}, {1,1,1}, {1,1,1}, 100, 1.33)
+mat1 = gr.material({0.7, 1.0, 0.7}, {0, 0, 0}, {0,0,0}, 10, 10000000, '')
+mat2 = gr.material({0.5, 1, 0.5}, {0, 0, 0}, {0,0,0}, 25, 10000000, '')
+mat3 = gr.material({1.0, 0.6, 0.1}, {0.5, 0.7, 0.5}, {0,0,0}, 50, 10000000, '')
+mat4 = gr.material({0.7, 0.6, 1.0}, {0.5, 0.5, 0.8}, {0,0,0}, 25, 10000000, '')
+mirror = gr.material({0, 0, 0}, {1, 1, 1}, {0,0,0}, 100, 10000000, '')
+glass = gr.material({0,0,0}, {1,1,1}, {1,1,1} ,100, 1.5, '') -- kd, ks, the third param is transmitted color, shininess, refraction index
+water = gr.material({0,0,0}, {1,1,1}, {1,1,1}, 100, 1.33, '')
 
-texture1 = gr.texture_material('checker.png', {0.7, 0.7, 0.7}, {0,0,0}, 25, 10000000)
+texture1 = gr.texture_material('checker.png', {0.7, 0.7, 0.7}, {0,0,0}, 25, 10000000, '')
 
 scene = gr.node('scene')
 
@@ -68,5 +68,5 @@ gr.render(scene,
       'scene.png', 600, 600,
       {0, 0, 10}, {0, 0, -1}, {0, 1, 0}, 50,
       {0.4, 0.4, 0.4}, {
-        gr.light({0, 2.45, 3.167}, {1, 1, 1}, {1, 0, 0}, 500000, 64, 1, 'square', 1.5) -- pos, colour, attenuation, num photons, power of initial photons, light type ('square','round','point'), power bias, size(if non point light).
-      }, 3, 0.1, 800, 'photon map', 32, 'pinhole', 180.0, 1) -- num recur, search radius, num photons per search area, render mode, num threads, eye mode, max psi for fisheye, num sqrt(samples) per pixel for stochastic rendering
+        gr.light({0, 2.48, 3.167}, {1, 1, 1}, {1, 0, 0}, 10000000, 64, 1, 'square', 1.5) -- pos, colour, attenuation, num photons, power of initial photons, light type ('square','round','point'), power bias, size(if non point light).
+      }, 3, 0.08, 1000, 'photon map', 32, 'pinhole', 180.0, 1) -- num recur, search radius, num photons per search area, render mode, num threads, eye mode, max psi for fisheye, num sqrt(samples) per pixel for stochastic rendering
