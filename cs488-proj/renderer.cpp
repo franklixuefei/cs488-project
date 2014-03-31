@@ -336,6 +336,7 @@ void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double re
     Vector3D srefl_dir = Formulas::perfectReflection(nl, dir); // specular reflection
     srefl_dir.normalize();
     Colour kd = ip.m_owner->get_material()->getDiffuse(ip.m_owner->get_primitive(), ip.m_orig_point);
+    Colour kt = ip.m_owner->get_material()->getTransmittedColour();
     if (hitMatReflID != DBL_MAX) { // translucent object
 #warning ray is hitting out of the object (to the air), assuming no two intact objects.
         Vector3D t_dir;
@@ -369,11 +370,11 @@ void Renderer::trace_photons(Point3D orig, Vector3D dir, Colour power, double re
                 if (rand1 < p) {
                     trace_photons(ip.m_point, refl_dir, reflP * power, refl_id, recur_depth + 1);
                 } else {
-                    trace_photons(ip.m_point, t_dir, transP * power * (into?kd:Colour(1,1,1)), into?hitMatReflID:1.0, recur_depth+1);
+                    trace_photons(ip.m_point, t_dir, transP * power * (into?kt:Colour(1,1,1)), into?hitMatReflID:1.0, recur_depth+1);
                 }
             } else {
                 trace_photons(ip.m_point, refl_dir, reflP * power, refl_id, recur_depth + 1);
-                trace_photons(ip.m_point, t_dir, transP * power, into?hitMatReflID:1.0, recur_depth + 1);
+                trace_photons(ip.m_point, t_dir, transP * power * (into?kt:Colour(1,1,1)), into?hitMatReflID:1.0, recur_depth + 1);
             }
         }
     } else { // non-translucent, specular or diffuse depending on kd_avg

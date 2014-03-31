@@ -2,8 +2,8 @@
 #include "primitive.hpp"
 #include "formulas.hpp"
 #include <cassert>
-PhongMaterial::PhongMaterial(const Colour& ks, double shininess, double refractive_index)
-: m_ks(ks), m_shininess(shininess), m_refractive_index(refractive_index)
+PhongMaterial::PhongMaterial(const Colour& ks, const Colour &kt, double shininess, double refractive_index)
+: m_ks(ks), m_kt(kt), m_shininess(shininess), m_refractive_index(refractive_index)
 {
 }
 
@@ -15,6 +15,12 @@ Colour PhongMaterial::getSpecular() const
 {
 	return m_ks;
 }
+
+Colour PhongMaterial::getTransmittedColour() const
+{
+    return m_kt;
+}
+
 Colour PhongMaterial::getShininess() const
 {
 	return m_shininess;
@@ -60,8 +66,8 @@ double PhongMaterial::getRefractiveIndex() const
 
 
 
-BasicPhongMaterial::BasicPhongMaterial(const Colour &kd, const Colour &ks, double shininess, double refractive_index) :
-PhongMaterial(ks, shininess, refractive_index),
+BasicPhongMaterial::BasicPhongMaterial(const Colour &kd, const Colour &ks, const Colour &kt, double shininess, double refractive_index) :
+PhongMaterial(ks, kt, shininess, refractive_index),
 m_kd(kd)
 {
     
@@ -78,8 +84,8 @@ Colour BasicPhongMaterial::getDiffuse(Primitive *primitive, const Point3D &p) co
 }
 
 
-ImageTextureMaterial::ImageTextureMaterial(const string &filename, const Colour &ks, double shininess, double refractive_index) :
-PhongMaterial(ks, shininess, refractive_index),
+ImageTextureMaterial::ImageTextureMaterial(const string &filename, const Colour &ks, const Colour &kt, double shininess, double refractive_index) :
+PhongMaterial(ks, kt, shininess, refractive_index),
 m_texture_map(new Image())
 {
     if (!m_texture_map->loadPng(filename)) {

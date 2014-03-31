@@ -443,18 +443,20 @@ int gr_material_cmd(lua_State* L)
     gr_material_ud* data = (gr_material_ud*)lua_newuserdata(L, sizeof(gr_material_ud));
     data->material = 0;
     
-    double kd[3], ks[3];
+    double kd[3], ks[3], kt[3];
     get_tuple(L, 1, kd, 3);
     get_tuple(L, 2, ks, 3);
+    get_tuple(L, 3, kt, 3);
     
-    double shininess = luaL_checknumber(L, 3);
+    double shininess = luaL_checknumber(L, 4);
     
-    double refractive_index = luaL_checknumber(L, 4);
+    double refractive_index = luaL_checknumber(L, 5);
     if (refractive_index > 999999.0) {
         refractive_index = DBL_MAX;
     }
     data->material = new BasicPhongMaterial(Colour(kd[0], kd[1], kd[2]),
                                             Colour(ks[0], ks[1], ks[2]),
+                                            Colour(kt[0], kt[1], kt[2]),
                                             shininess, refractive_index);
     
     luaL_newmetatable(L, "gr.material");
@@ -474,18 +476,20 @@ int gr_texture_material_cmd(lua_State* L)
     
     const char* filename = luaL_checkstring(L, 1);
     
-    double ks[3];
+    double ks[3], kt[3];
     
     get_tuple(L, 2, ks, 3);
+    get_tuple(L, 3, kt, 3);
     
-    double shininess = luaL_checknumber(L, 3);
+    double shininess = luaL_checknumber(L, 4);
     
-    double refractive_index = luaL_checknumber(L, 4);
+    double refractive_index = luaL_checknumber(L, 5);
     if (refractive_index > 999999.0) {
         refractive_index = DBL_MAX;
     }
     data->material = new ImageTextureMaterial(filename,
                                               Colour(ks[0], ks[1], ks[2]),
+                                              Colour(kt[0], kt[1], kt[2]),
                                               shininess,refractive_index);
     
     luaL_newmetatable(L, "gr.material");

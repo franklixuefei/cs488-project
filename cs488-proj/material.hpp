@@ -12,13 +12,13 @@ class Primitive;
 
 class PhongMaterial {
 public:
-    PhongMaterial(const Colour& ks, double shininess, double refractive_index);
+    PhongMaterial(const Colour& ks, const Colour& kt, double shininess, double refractive_index);
     virtual ~PhongMaterial();
     
     virtual Colour getDiffuse(Primitive *primitive, const Point3D &p) const=0;
     Colour getSpecular() const;
+    Colour getTransmittedColour() const;
     Colour getShininess() const;
-    
     Colour getColour(
                      const Vector3D& view_dir,
                      const std::list<Light*>& lights,
@@ -29,6 +29,7 @@ public:
     
 protected:
     Colour m_ks;
+    Colour m_kt;
     double m_shininess;
     double m_test_reflectance; // for hard-coded testing.
     double m_refractive_index; // n (glass = 1.5, water = 1.33, air = 1, non-trans = +inf)
@@ -37,7 +38,7 @@ protected:
 
 class BasicPhongMaterial : public PhongMaterial {
 public:
-    BasicPhongMaterial(const Colour &kd, const Colour &ks, double shininess, double refractive_index);
+    BasicPhongMaterial(const Colour &kd, const Colour &ks, const Colour &kt, double shininess, double refractive_index);
     virtual ~BasicPhongMaterial();
     Colour getDiffuse(Primitive *primitive, const Point3D &p) const;
 protected:
@@ -47,7 +48,7 @@ protected:
 
 class ImageTextureMaterial : public PhongMaterial {
 public:
-    ImageTextureMaterial(const string &filename, const Colour &ks, double shininess, double refractive_index);
+    ImageTextureMaterial(const string &filename, const Colour &ks, const Colour &kt, double shininess, double refractive_index);
     virtual ~ImageTextureMaterial();
     Colour getDiffuse(Primitive *primitive, const Point3D &p) const;
 protected:
