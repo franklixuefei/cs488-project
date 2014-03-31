@@ -51,7 +51,7 @@ Renderer::Renderer(
     m_fisheye_camera(NULL)
 {
     size_t total_num_init_photons = 0;
-    for (std::list<Light*>::const_iterator it = m_lights.cbegin(); it != m_lights.cend(); ++it) {
+    for (std::list<Light*>::const_iterator it = m_lights.begin(); it != m_lights.end(); ++it) {
         total_num_init_photons += (*it)->getNumPhotons();
     }
     std::cerr << "total initial number of photons: " << total_num_init_photons << endl;
@@ -86,7 +86,7 @@ void Renderer::build_photon_map()
 {
     Point3D orig;
     Vector3D ray_dir;
-    for (std::list<Light*>::const_iterator it = m_lights.cbegin(); it != m_lights.cend(); ++it) { // for each light source
+    for (std::list<Light*>::const_iterator it = m_lights.begin(); it != m_lights.end(); ++it) { // for each light source
         Light *light = *it;
         double x, y, z;
         for (int i = 0; i < light->getNumPhotons(); ++i) {
