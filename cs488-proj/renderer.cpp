@@ -55,7 +55,7 @@ Renderer::Renderer(
         total_num_init_photons += (*it)->getNumPhotons();
     }
     std::cerr << "total initial number of photons: " << total_num_init_photons << endl;
-    m_photon_map = new PhotonMap(500000000/*(int)(total_num_init_photons*m_photon_recursion)*/);
+    m_photon_map = new PhotonMap(450000000/*(int)(total_num_init_photons*m_photon_recursion)*/);
 	m_view.normalize();
 	m_up.normalize();
 	m_left.normalize();
