@@ -22,7 +22,7 @@ photo = gr.texture_material('me.png', {0.05, 0.05, 0.05}, {0,0,0}, 20, 10000000,
 bump_wall = gr.texture_material('rock_texture.png',{0,0,0},{0,0,0}, 30, 10000000, 'back_wall.png')
 normal_wall = gr.texture_material('rock_texture.png',{0,0,0},{0,0,0}, 30, 10000000, '')
 
-floor_texture = gr.texture_material('floor.png', {0.1,0.1,0.1},{0,0,0}, 25, 10000000, '')
+floor_texture = gr.texture_material('floor.png', {0,0,0},{0,0,0}, 25, 10000000, '')
 
 -- scene node (top node)
 scene = gr.node('scene')
