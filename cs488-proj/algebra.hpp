@@ -558,6 +558,14 @@ inline Colour operator *(const Colour& a, const Colour& b)
   return Colour(a.R()*b.R(), a.G()*b.G(), a.B()*b.B());
 }
 
+inline Colour operator /(const Colour& a, double s)
+{
+    if (isZero(s, SMALL_EPSILON)) {
+        return Colour(a);
+    }
+    return Colour(a.R()/s, a.G()/s, a.B()/s);
+}
+
 inline Colour operator +(const Colour& a, const Colour& b)
 {
   return Colour(a.R()+b.R(), a.G()+b.G(), a.B()+b.B());

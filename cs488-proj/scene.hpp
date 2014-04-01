@@ -147,6 +147,16 @@ private:
                                   const Colour &ambient,
                                   double refl_id,
                                   int recursive_depth) const;
+    
+    Colour glossyReflectionContribution(
+                                        const Vector3D& view_dir,
+                                        const Vector3D& normal,
+                                        const Point3D& start,
+                                        const std::list<Light*>& lights,
+                                        const Colour &ambient,
+                                        double refl_id,
+                                        int recursive_depth) const;
+    
     Colour lightsContribution(
                               const IntersectionPoint& ip,
                               const Vector3D &normal,

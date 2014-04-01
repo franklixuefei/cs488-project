@@ -218,6 +218,30 @@ Colour GeometryNode::reflectionContribution(const Vector3D& view_dir, // incomin
     return Colour(0,0,0);
 }
 
+Colour GeometryNode::glossyReflectionContribution(const Vector3D &view_dir, const Vector3D &normal, const Point3D &start, const std::list<Light *> &lights, const Colour &ambient, double refl_id, int recursive_depth) const
+{
+    Vector3D n = normal;
+    Colour avg = Colour(0,0,0);
+    if (recursive_depth >= 0) {
+        int counter = 0;
+        for (int i = 0; i < 10; ++i) {
+            double rand1 = 30.0 * (rand() / RAND_MAX - 0.5);
+            double rand2 = 30.0 * (rand() / RAND_MAX - 0.5);
+            double rand3 = 30.0 * (rand() / RAND_MAX - 0.5);
+            n = n + Vector3D(rand1, rand2, rand3);
+            n.normalize();
+            IntersectionPoint ip;
+            Vector3D reflected_dir = Formulas::perfectReflection(n, view_dir);
+            if (SceneNode::s_renderer->get_root()->intersect(start, reflected_dir, ip, refl_id)) {
+                avg = avg + ip.m_owner->getColourForPoint(start, ip, lights, ambient, refl_id, recursive_depth-1);
+                counter++;
+            }
+        }
+        avg  = avg / counter;
+    }
+    return avg;
+}
+
 
 
 Colour GeometryNode::lightsContribution(
@@ -235,7 +259,8 @@ Colour GeometryNode::lightsContribution(
         if (pl) {
             
         } else if (sl) {
-            #warning TODO: implement soft shadow here!!!
+#warning TODO: implement soft shadow here!!!
+#warning NOTE: for pure photon mapping, no soft shadows needed.
         }
         Vector3D light_dir = (*it)->getPosition() - ip.m_point;
         double lightDistSq = light_dir.length2();
