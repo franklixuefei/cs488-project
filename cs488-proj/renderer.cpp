@@ -261,8 +261,7 @@ bool StochasticRenderer::getColourForPixel(int x, int y, Colour &c)
             double x_offset = (((double)rand() / (double)RAND_MAX - 0.5) / m_pixel_size) +
             stepSize * (double)sub_x - 0.5 + stepSize / 2.0;
             double y_offset = (((double)rand() / (double)RAND_MAX - 0.5) / m_pixel_size) +
-            stepSize * (double)sub_x - 0.5 + stepSize / 2.0;
-            
+            stepSize * (double)sub_x - 0.5 + stepSize / 2.0; // -0.875 ~ 0.875
             double dx = orig_dx + x_offset;
             double dy = orig_dy + y_offset;
             

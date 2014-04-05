@@ -65,9 +65,9 @@ t1:rotate('X', 45)
 -- eye type can be 'pinhole', 'fisheye'
 
 gr.render(scene,
-      'scene.png', 600, 600,
+      'hard_shadow_without_caustics.png', 600, 600,
       {0, 0, 10}, {0, 0, -1}, {0, 1, 0}, 50,
       {0.4, 0.4, 0.4}, {
-        gr.light({0, 2.48, 3.167}, {1, 1, 1}, {1, 0, 0}, 170000000, 70, 1, 'square', 1.5) -- pos, colour, attenuation, num photons, power of initial photons, light type ('square','round','point'), power bias, size(if non point light).
-      }, 5, 0.04, 6000, 'photon map', 32, 'pinhole', 180.0, 1) -- num recur, search radius, num photons per search area, render mode, num threads, eye mode, max psi for fisheye, num sqrt(samples) per pixel for stochastic rendering
+        gr.light({0, 2.48, 3.167}, {0.6, 0.6, 0.6}, {1, 0, 0}, 5000000, 107, 1, 'square', 1.5) -- pos, colour, attenuation, num photons, power of initial photons, light type ('square','round','point'), power bias, size(if non point light).
+      }, 5, 0.04, 6000, 'ray tracing', 32, 'pinhole', 180.0, 4) -- num recur, search radius, num photons per search area, render mode, num threads, eye mode, max psi for fisheye, num sqrt(samples) per pixel for stochastic rendering
 
